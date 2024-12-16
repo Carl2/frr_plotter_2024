@@ -39,11 +39,25 @@ def gen_search_for_fn(search_str: str):
     return search_for
 
 
-def split_by(search_str: str, keywords: list[str]) -> dict[str:str]:
+def split_by(search_str: str, keywords: list[str]) -> list[str]:
+    """Split a string by the given keywords.
+
+    This function searches for occurrences of the specified keywords in the
+    provided search string. It returns a list of substrings found between
+    those keywords. If a keyword is not found, None is added to the result
+    list for that keyword.
+
+    Args:
+        search_str (str): The string in which to search for keywords.
+        keywords (list[str]): A list of keywords to search for in the search_str.
+
+    Returns:
+        list[str]: A list of substrings found between the keywords.
+                    If a keyword is not found, None is included in the list.
+    """
     search_fn = gen_search_for_fn(search_str)
 
     def splitter_fn(init: dict, keyword) -> dict:
-
         search_fn = init[0]['fn']
         pos = init[0]['pos']
         maybe_ok = search_fn(keyword, pos)
@@ -60,52 +74,6 @@ def split_by(search_str: str, keywords: list[str]) -> dict[str:str]:
     return list(output_arr[1:])
 
 
-# def convert_time_str(time_str: str) -> Maybe:
-#     """Convert timestr to timedelta.
-
-#     The problem is that it looks like "1 hrs, 23 m 46.896 s"
-#     But it could also be "45 m" or "1 hrs, 23.34 s"
-#     This of course is a pain.
-#     So how would we take care of this?
-#     First we need to check if there is a ","
-#     """
-#     next_pos = 0
-#     hours = 0
-#     minutes = 0
-#     seconds = 0
-#     milli_seconds = 0
-
-#     hours_fn = safe_find_fn("hrs,")
-#     maybe_hrs = hours_fn(time_str)
-#     if maybe_hrs.is_just():
-#         next_pos, hrs_str = maybe_hrs.value
-#         hours = int(hrs_str)
-
-#     min_fn = safe_find_fn("m", next_pos)
-#     maybe_min = min_fn(time_str)
-#     if maybe_min.is_just():
-#         next_pos, min_str = maybe_min.value
-#         minutes = int(min_str)
-
-#     sec_fn = safe_find_fn(" s", next_pos)
-#     maybe_sec = sec_fn(time_str)
-#     if maybe_sec.is_just():
-#         next_pos, sec_str = maybe_sec.value
-#         sec_str, milli_str = sec_str.split('.')
-#         seconds = int(sec_str)
-#         milli_seconds = int(milli_str)
-
-#     return timedelta(hours=hours,
-#                      minutes=minutes,
-#                      seconds=seconds,
-#                      milliseconds=milli_seconds)
-
-
-
-
-
-
-
 if __name__ == '__main__':
     find_fn = safe_find_fn("hrs,")
 
@@ -119,11 +87,6 @@ if __name__ == '__main__':
     next_pos, sec_str = find_fn("1 hrs, 23 m 46.896 s").value
     ic(sec_str)
 
-    # ic(convert_time_str("1 hrs, 23 m 46.896 s"))
-    # ic(convert_time_str("23 m 46.896 s"))
-    # ic(convert_time_str("2 m"))
-    # ic(convert_time_str("46.896 s"))
-    # ic(convert_time_str("1 hrs, 46.896 s"))
 
     search_for = gen_search_for_fn("1 hrs, 46.896 s")
     next_pos, hours = search_for("hrs,").value
