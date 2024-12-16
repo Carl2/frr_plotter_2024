@@ -1,7 +1,3 @@
-Write a README note on what the provided code does
-
-
-
 * README
 
 ** Overview
@@ -44,3 +40,6 @@ If you wish to process different race data, modify the =data= and =data_hdr= var
 ** Conclusion
 
 This script provides a comprehensive way to visualize competitive race data, making it easier to analyze rider performance across multiple stages.
+
+** Note
+I have used AI to provide the documentation :)
