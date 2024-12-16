@@ -1,0 +1,46 @@
+Write a README note on what the provided code does
+
+
+
+* README
+
+** Overview
+
+The provided Python script, =main2.py=, processes and visualizes race data for riders across multiple stages of a competition. Utilizing libraries such as =pandas=, =numpy=, and =matplotlib=, it generates various plots representing riders' times, gaps, and positions.
+
+** Key Features
+
+1. *Data Parsing*:
+   - Converts time strings (e.g., "1 hrs, 23 m 46.896 s") into =timedelta= objects for easier calculations.
+   - Parses the riders' time gaps from strings (e.g., "+2 m 59.260 s") into =timedelta=.
+
+2. *Data Handling*:
+   - Groups data by rider name and stage, allowing for individual analyses and comparisons.
+
+3. *Visualizations*:
+   - Generates three types of plots saved as SVG files:
+     - Rider Times (=plot_rider_times.svg=)
+     - Rider Time Gaps (=plot_rider_egap.svg=)
+     - Rider Positions (=plot_rider_pos.svg=)
+
+** Usage
+
+1. Ensure you have the required libraries installed. You can install them using:
+   #+begin_src bash
+   pip install pandas numpy matplotlib icecream
+   #+end_src
+
+2. Run the script using Python:
+   #+begin_src bash
+   python main2.py
+   #+end_src
+
+3. The output SVG files will be saved in the current directory.
+
+** Modifications
+
+If you wish to process different race data, modify the =data= and =data_hdr= variables with your own data set.
+
+** Conclusion
+
+This script provides a comprehensive way to visualize competitive race data, making it easier to analyze rider performance across multiple stages.
