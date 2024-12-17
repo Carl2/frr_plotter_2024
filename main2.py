@@ -31,7 +31,7 @@ def make_time_delta(hours_str: str, minute_str: str,
     seconds = convert_to_val(second_str)
     milli = convert_to_val(milli_str)
 
-    ic(hours, minutes, seconds, milli)
+
     return timedelta(hours=hours, minutes=minutes,
                      seconds=seconds, milliseconds=milli)
 
@@ -98,7 +98,6 @@ def handle_egap_name_inc(init_values: dict, stage: pd.DataFrame):
         if stage > 1:
             previous = vals[stage-2]
             val = val + previous
-            ic(vals, stage, previous)
 
     vals[int(stage)-1] = val
     return init_values
