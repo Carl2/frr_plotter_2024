@@ -1,0 +1,431 @@
+* Overview
+
+I want to create my own AI communication module. The reason is that I
+don't like the approach of Lanchain and llamaindex and so on. For me
+they dont feel natural. Now, maybe my approach isnt natural for some
+one else, but they always have a choice. Now I know my limitation
+(espcially when it comes to time), but i really want to have more
+control over the workflow, and make it a more functional approach,
+that means will have a pipeline that can be used.
+
+* Visual approach
+
+Lets first break down what is needed to talk to a AI, in a more
+abstract way
+
+** Communication endpoint
+To connect to an AI we need an end point , now what is a endpoint in
+this sense.
+ - host
+ - port
+ - path
+
+This is the first puzzle piece, and quite crucial.  This data needs to
+be stored and passed around.  Of course we talking about a struct or a
+dictionary.  I think dictionary is simpler, and it doesn't make sense
+to make something new
+
+
+#+begin_src python
+  endpoint_ollama = {
+      "host": "localhost:11434",
+      "path": "api/generate"
+  }
+  endpoint_openrouter = {
+      "host": "openrouter.ai",
+      "path": "/api/v1/chat/completions"
+  }
+#+end_src
+
+Now the path have some different construct.
+  - generate :: Text generation, for example code completion, creative writing and so on.
+  - completion :: Often more general pupose , and can be used for
+    completing text, summarizing, or transforming text based on
+    specific instructions. string prompt but might also support additional parameters like temperature, max tokens, etc.
+
+| Feature            | /generate or /completion           | /chat/completions                      |
+|--------------------+------------------------------------+----------------------------------------|
+| Input Type         | Single string prompt               | Structured messages with roles         |
+| Context Handling   | Manual (append previous outputs)   | Manual (via `messages` array)          |
+| Use Case Focus     | General text generation            | Conversational AI/chatbots             |
+| Model Optimization | Legacy models (e.g., text-davinci) | Chat-focused models (e.g., gpt-turbo)  |
+| Flexibility        | More flexible for non-chat tasks   | Better suited for dialogue-based tasks |
+
+** Headers
+Header is another topic, which want change to much in a conversation.
+Though there are some aspects that can be quite useful
+
+
+#+NAME: curl-ollama-response
+#+HEADER: :eval never-export  :results output :wrap example :exports both
+#+begin_src bash :dir "/tmp/"
+
+  curl -X POST http://localhost:11434/api/generate \
+  -H "Content-Type: application/json" \
+  -H "Date: $(date -u +"%a, %d %b %Y %H:%M:%S GMT")" \
+  -H "Client-Request-ID: $(uuidgen)" \
+  -d '{
+    "model": "qwen2.5-coder:latest",
+    "prompt": "Explain the concept of artificial intelligence in simple terms. be short and consice!",
+    "stream": false
+  }'
+#+end_src
+
+#+RESULTS: curl-ollama-response
+#+begin_example
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T09:32:27.755448543Z","response":"Artificial Intelligence (AI) is when computers simulate human-like thinking and actions using algorithms and machine learning. It helps machines learn from data, make decisions, and perform tasks that typically require human intelligence. AI can recognize patterns, solve problems, understand languages, and even create art or music. Essentially, it makes machines smarter!","done":true,"done_reason":"stop","context":[151644,8948,198,2610,525,1207,16948,11,3465,553,54364,14817,13,1446,525,264,10950,17847,13,151645,198,151644,872,198,840,20772,279,7286,315,20443,11229,304,4285,3793,13,387,2805,323,1585,558,0,151645,198,151644,77091,198,9286,16488,21392,320,15469,8,374,979,18495,37453,3738,12681,7274,323,6168,1667,25185,323,5662,6832,13,1084,8609,12645,3960,504,821,11,1281,11181,11,323,2736,9079,429,11136,1373,3738,11229,13,15235,646,15282,12624,11,11625,5322,11,3535,15459,11,323,1496,1855,1947,476,4627,13,70754,11,432,3643,12645,46478,0],"total_duration":5167705170,"load_duration":2192361816,"prompt_eval_count":46,"prompt_eval_duration":100317000,"eval_count":66,"eval_duration":2831215000}
+#+end_example
+
+Lets try this with /python/ instead
+
+#+NAME: urllib-header
+#+HEADER: :results output raw :exports both :wrap example
+#+begin_src python :noweb yes
+  import urllib3
+  import json
+
+  http = urllib3.PoolManager()
+
+  def generate_request(url, model, prompt):
+      headers = {
+          "Content-Type": "application/json",
+          "Client-Request-ID": "23040"
+      }
+
+      data = json.dumps({
+          "model": model,
+          "prompt": prompt,
+          "stream": True
+      })
+
+      response = http.request(
+          method="POST",
+          url=url,
+          headers=headers,
+          body=data,
+      )
+
+      return response
+
+  url = "http://localhost:11434/api/generate"
+  model = "qwen2.5-coder:latest"
+  prompt = "What are the consequences of AI?"
+
+  response = generate_request(url, model, prompt)
+  print(f"{response.status}, {response.headers},\n\n {response.data.decode('utf-8')}")
+
+#+end_src
+
+#+RESULTS: urllib-header
+#+begin_example
+200, HTTPHeaderDict({'Content-Type': 'application/x-ndjson', 'Date': 'Fri, 20 Dec 2024 15:44:49 GMT', 'Transfer-Encoding': 'chunked'}),
+
+ {"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:49.649867854Z","response":"AI","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:49.691833692Z","response":" has","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:49.735763369Z","response":" both","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:49.778228864Z","response":" positive","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:49.821171347Z","response":" and","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:49.864603193Z","response":" negative","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:49.908149093Z","response":" implications","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:49.951423894Z","response":".\n\n","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:49.994057364Z","response":"Positive","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.037866514Z","response":" Imp","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.081705708Z","response":"lications","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.125170499Z","response":":\n","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.16822843Z","response":"1","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.210868088Z","response":".","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.254858562Z","response":" Improved","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.296863966Z","response":" Efficiency","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.339238715Z","response":":","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.383276442Z","response":" AI","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.426195365Z","response":" can","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.46990712Z","response":" automate","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.512739916Z","response":" tasks","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.554911961Z","response":",","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.59735636Z","response":" reducing","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.641237536Z","response":" human","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.683663274Z","response":" error","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.726419244Z","response":" and","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.76924561Z","response":" improving","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.812776214Z","response":" efficiency","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.855753715Z","response":" in","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.898874533Z","response":" various","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.941402301Z","response":" industries","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.98535887Z","response":".\n","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.029786587Z","response":"2","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.072358054Z","response":".","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.11485669Z","response":" Better","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.157358573Z","response":" Decision","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.201297576Z","response":"-M","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.244765897Z","response":"aking","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.287331733Z","response":":","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.330794215Z","response":" AI","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.372242791Z","response":" can","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.415328981Z","response":" analyze","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.459358607Z","response":" large","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.505126363Z","response":" amounts","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.547932199Z","response":" of","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.591720116Z","response":" data","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.635213125Z","response":" quickly","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.67888204Z","response":" and","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.722926967Z","response":" accurately","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.766157655Z","response":",","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.809846363Z","response":" providing","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.853666491Z","response":" insights","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.898163064Z","response":" that","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.941487301Z","response":" can","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.985066371Z","response":" inform","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.029242279Z","response":" better","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.072494326Z","response":" decision","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.115865208Z","response":"-making","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.15880116Z","response":".\n","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.203157434Z","response":"3","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.247347324Z","response":".","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.290681446Z","response":" Enhanced","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.333806226Z","response":" Healthcare","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.377774484Z","response":":","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.421307888Z","response":" AI","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.4642911Z","response":" can","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.50720968Z","response":" help","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.550502825Z","response":" doctors","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.593694708Z","response":" diagnose","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.636784108Z","response":" diseases","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.679640822Z","response":" more","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.723676367Z","response":" accurately","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.767419316Z","response":",","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.811306438Z","response":" improve","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.854851642Z","response":" patient","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.898426704Z","response":" care","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.94155133Z","response":",","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.984257659Z","response":" and","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.027211701Z","response":" develop","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.070371147Z","response":" new","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.113104745Z","response":" treatments","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.155502435Z","response":".\n","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.198324426Z","response":"4","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.242212111Z","response":".","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.286168873Z","response":" Personal","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.328821172Z","response":"ization","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.372268256Z","response":":","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.41580397Z","response":" AI","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.458318255Z","response":" can","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.500160021Z","response":" personalize","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.543572825Z","response":" experiences","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.587228695Z","response":" for","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.631357122Z","response":" individuals","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.673785519Z","response":",","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.716550382Z","response":" such","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.759073575Z","response":" as","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.802802191Z","response":" recommending","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.846078719Z","response":" products","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.889614436Z","response":" or","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.932993314Z","response":" services","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.975698652Z","response":" based","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.018979444Z","response":" on","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.062690209Z","response":" their","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.105562114Z","response":" preferences","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.149366191Z","response":".\n\n","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.192435142Z","response":"Negative","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.234517274Z","response":" Imp","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.278046076Z","response":"lications","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.321349574Z","response":":\n","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.36386919Z","response":"1","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.40732029Z","response":".","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.450289305Z","response":" Job","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.493830342Z","response":" Loss","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.537410005Z","response":"es","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.581644163Z","response":":","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.625712465Z","response":" Automation","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.668752758Z","response":" could","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.710404745Z","response":" lead","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.75364026Z","response":" to","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.796044422Z","response":" job","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.83951495Z","response":" losses","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.883561654Z","response":" in","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.926738489Z","response":" industries","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.969984637Z","response":" that","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.012213156Z","response":" are","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.055794225Z","response":" heavily","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.097794867Z","response":" reliant","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.141118696Z","response":" on","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.184799232Z","response":" human","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.228483782Z","response":" labor","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.27194768Z","response":".\n","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.315209636Z","response":"2","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.359149764Z","response":".","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.403341761Z","response":" Privacy","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.445992489Z","response":" Concern","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.4901705Z","response":"s","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.533861815Z","response":":","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.577794835Z","response":" The","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.621967766Z","response":" use","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.665317395Z","response":" of","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.708358218Z","response":" AI","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.751382435Z","response":" involves","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.795199952Z","response":" collecting","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.839025976Z","response":" and","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.882989337Z","response":" processing","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.926333402Z","response":" large","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.969204647Z","response":" amounts","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.01424439Z","response":" of","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.056864471Z","response":" data","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.100458594Z","response":",","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.145169664Z","response":" which","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.18961427Z","response":" raises","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.23285911Z","response":" privacy","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.275501291Z","response":" concerns","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.31961471Z","response":".\n","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.363925124Z","response":"3","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.408059385Z","response":".","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.451526429Z","response":" Bias","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.495227765Z","response":":","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.53889327Z","response":" If","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.582741438Z","response":" AI","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.626550568Z","response":" systems","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.670427058Z","response":" are","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.715024409Z","response":" trained","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.759499033Z","response":" on","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.803704667Z","response":" biased","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.845753705Z","response":" data","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.889901547Z","response":" or","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.932397552Z","response":" designed","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.975050322Z","response":" with","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.018819746Z","response":" biases","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.062327438Z","response":",","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.106896584Z","response":" they","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.150789653Z","response":" can","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.194036257Z","response":" perpet","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.23762232Z","response":"uate","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.281128273Z","response":" and","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.324742867Z","response":" even","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.370962424Z","response":" amplify","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.414446738Z","response":" existing","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.457310486Z","response":" inequalities","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.500541758Z","response":".\n","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.544805368Z","response":"4","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.58841268Z","response":".","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.630732619Z","response":" Security","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.673484102Z","response":" Ris","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.716244778Z","response":"ks","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.759626668Z","response":":","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.802744265Z","response":" As","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.846343704Z","response":" AI","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.889794855Z","response":" becomes","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.933033509Z","response":" more","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.976942553Z","response":" integrated","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.02108403Z","response":" into","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.064815133Z","response":" our","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.108859615Z","response":" daily","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.152820942Z","response":" lives","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.197441645Z","response":",","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.242474832Z","response":" there","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.286958495Z","response":" is","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.331154406Z","response":" a","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.375421259Z","response":" risk","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.420351261Z","response":" that","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.465065497Z","response":" it","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.509184053Z","response":" could","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.552799053Z","response":" be","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.595704746Z","response":" hacked","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.639798653Z","response":" or","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.682607166Z","response":" used","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.725883798Z","response":" malicious","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.769152239Z","response":"ly","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.813435559Z","response":".\n\n","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.857438946Z","response":"It","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.901834207Z","response":"'s","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.945658698Z","response":" important","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.988755086Z","response":" to","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.032826006Z","response":" carefully","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.076993666Z","response":" consider","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.120702992Z","response":" the","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.163891933Z","response":" potential","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.207591603Z","response":" consequences","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.250970905Z","response":" of","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.29419844Z","response":" AI","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.338617391Z","response":" and","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.381225621Z","response":" work","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.423825767Z","response":" to","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.466870266Z","response":" mitigate","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.509842351Z","response":" any","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.553690578Z","response":" negative","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.596777567Z","response":" impacts","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.641542418Z","response":" while","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.685202617Z","response":" leveraging","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.728611186Z","response":" its","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.771144397Z","response":" benefits","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.8151526Z","response":".","done":false}
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.857800359Z","response":"","done":true,"done_reason":"stop","context":[151644,8948,198,2610,525,1207,16948,11,3465,553,54364,14817,13,1446,525,264,10950,17847,13,151645,198,151644,872,198,3838,525,279,15917,315,15235,30,151645,198,151644,77091,198,15469,702,2176,6785,323,8225,24154,382,35490,14390,10709,510,16,13,58123,66567,25,15235,646,68611,9079,11,17719,3738,1465,323,18392,15024,304,5257,19102,624,17,13,23434,40425,5251,1765,25,15235,646,23643,3460,14713,315,821,6157,323,29257,11,8241,25709,429,646,6051,2664,5480,27746,624,18,13,61449,38335,25,15235,646,1492,16026,57581,18808,803,29257,11,7269,8720,2453,11,323,2225,501,22183,624,19,13,19207,2022,25,15235,646,80838,11449,369,7775,11,1741,438,64674,3871,476,3516,3118,389,862,19322,382,38489,14390,10709,510,16,13,12011,24704,288,25,53778,1410,2990,311,2618,17683,304,19102,429,525,16916,88127,389,3738,9327,624,17,13,18874,51247,82,25,576,990,315,15235,17601,25895,323,8692,3460,14713,315,821,11,892,24886,12345,10520,624,18,13,82990,25,1416,15235,5942,525,16176,389,47661,821,476,6188,448,49083,11,807,646,21585,6292,323,1496,96068,6350,92234,624,19,13,8234,53363,2787,25,1634,15235,9044,803,18250,1119,1039,7298,6305,11,1052,374,264,5214,429,432,1410,387,46839,476,1483,38170,398,382,2132,594,2989,311,15516,2908,279,4650,15917,315,15235,323,975,311,49360,894,8225,24905,1393,76482,1181,7567,13],"total_duration":10316687691,"load_duration":12720446,"prompt_eval_count":36,"prompt_eval_duration":53454000,"eval_count":236,"eval_duration":10207910000}
+
+#+end_example
+
+** Streaming
+Its one thing to read everything into a buffer and then output it, its another to take care of the stream.
+
+(setq python-shell-unbuffered "python -u")
+#+NAME: urllib-header-stream
+#+HEADER: :results output raw :exports both :wrap example
+#+begin_src python :noweb yes
+  import urllib3
+  import json
+
+  http = urllib3.PoolManager()
+
+
+  headers = {
+      "Content-Type": "application/json",
+      "Client-Request-ID": "23040"
+  }
+
+  data = json.dumps({
+      "model": "qwen2.5-coder:latest",
+      "prompt": "What are the consequences of AI?",
+      "stream": True
+  })
+
+  response = http.request(
+      method="POST",
+      url="http://localhost:11434/api/generate",
+      headers=headers,
+      body=data,
+      preload_content=False
+  )
+
+  for chunk in response.stream():
+    chunk_data = chunk.decode('utf-8')
+    try:
+        json_response = json.loads(chunk_data)
+        if 'response' in json_response:
+            print(json_response['response'], end='', flush=True)
+    except json.JSONDecodeError:
+        pass
+
+
+  response.release_conn()
+#+end_src
+
+#+RESULTS: urllib-header-stream
+#+begin_example
+AI can have both positive and negative consequences depending on how it is developed and used.
+
+Positive consequences of AI include:
+
+1. Improved efficiency: AI can automate routine tasks, reducing the need for human labor and increasing productivity.
+2. Increased accuracy: AI algorithms can process large amounts of data quickly and accurately, leading to better decision-making.
+3. Enhanced safety: AI can be used in various industries such as healthcare, transportation, and security to improve safety standards.
+4. Personalization: AI can analyze user behavior and preferences, allowing businesses to provide personalized experiences and products.
+
+Negative consequences of AI include:
+
+1. Job displacement: Automation and efficiency gains can lead to job loss and economic disruption, particularly for workers in industries that rely heavily on manual labor.
+2. Bias and discrimination: AI systems can perpetuate existing biases and discriminative practices if the data they are trained on is not diverse or representative.
+3. Privacy concerns: AI technologies such as facial recognition and surveillance can raise privacy concerns and lead to increased surveillance of individuals.
+4. Security risks: AI can be used for malicious purposes, such as cyber attacks and identity theft.
+
+It's important to carefully consider the potential consequences of AI and work towards responsible development and deployment of these technologies to maximize their benefits while mitigating any negative impacts.
+#+end_example
+
+
+* Resources
+[[https://github.com/ollama/ollama/blob/main/docs/api.md][Ollama API]]
+[[https://openrouter.ai/docs/requests][openrouter API]]
