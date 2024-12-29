@@ -1,3 +1,8 @@
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-bigblow.setup
+#+OPTIONS: broken-links:t ^:nil
+#+author: calle
+
+
 * Overview
 
 I want to create my own AI communication module. The reason is that I
@@ -9,6 +14,9 @@ control over the workflow, and make it a more functional approach,
 that means will have a pipeline that can be used.
 
 * Visual approach
+:PROPERTIES:
+:ID:       e8af6a4d-90dd-4aac-bb72-044638fb6b0f
+:END:
 
 Lets first break down what is needed to talk to a AI, in a more
 abstract way
@@ -116,248 +124,6 @@ Lets try this with /python/ instead
 
 #+end_src
 
-#+RESULTS: urllib-header
-#+begin_example
-200, HTTPHeaderDict({'Content-Type': 'application/x-ndjson', 'Date': 'Fri, 20 Dec 2024 15:44:49 GMT', 'Transfer-Encoding': 'chunked'}),
-
- {"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:49.649867854Z","response":"AI","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:49.691833692Z","response":" has","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:49.735763369Z","response":" both","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:49.778228864Z","response":" positive","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:49.821171347Z","response":" and","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:49.864603193Z","response":" negative","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:49.908149093Z","response":" implications","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:49.951423894Z","response":".\n\n","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:49.994057364Z","response":"Positive","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.037866514Z","response":" Imp","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.081705708Z","response":"lications","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.125170499Z","response":":\n","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.16822843Z","response":"1","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.210868088Z","response":".","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.254858562Z","response":" Improved","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.296863966Z","response":" Efficiency","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.339238715Z","response":":","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.383276442Z","response":" AI","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.426195365Z","response":" can","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.46990712Z","response":" automate","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.512739916Z","response":" tasks","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.554911961Z","response":",","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.59735636Z","response":" reducing","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.641237536Z","response":" human","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.683663274Z","response":" error","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.726419244Z","response":" and","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.76924561Z","response":" improving","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.812776214Z","response":" efficiency","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.855753715Z","response":" in","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.898874533Z","response":" various","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.941402301Z","response":" industries","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:50.98535887Z","response":".\n","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.029786587Z","response":"2","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.072358054Z","response":".","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.11485669Z","response":" Better","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.157358573Z","response":" Decision","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.201297576Z","response":"-M","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.244765897Z","response":"aking","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.287331733Z","response":":","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.330794215Z","response":" AI","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.372242791Z","response":" can","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.415328981Z","response":" analyze","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.459358607Z","response":" large","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.505126363Z","response":" amounts","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.547932199Z","response":" of","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.591720116Z","response":" data","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.635213125Z","response":" quickly","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.67888204Z","response":" and","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.722926967Z","response":" accurately","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.766157655Z","response":",","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.809846363Z","response":" providing","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.853666491Z","response":" insights","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.898163064Z","response":" that","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.941487301Z","response":" can","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:51.985066371Z","response":" inform","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.029242279Z","response":" better","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.072494326Z","response":" decision","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.115865208Z","response":"-making","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.15880116Z","response":".\n","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.203157434Z","response":"3","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.247347324Z","response":".","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.290681446Z","response":" Enhanced","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.333806226Z","response":" Healthcare","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.377774484Z","response":":","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.421307888Z","response":" AI","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.4642911Z","response":" can","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.50720968Z","response":" help","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.550502825Z","response":" doctors","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.593694708Z","response":" diagnose","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.636784108Z","response":" diseases","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.679640822Z","response":" more","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.723676367Z","response":" accurately","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.767419316Z","response":",","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.811306438Z","response":" improve","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.854851642Z","response":" patient","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.898426704Z","response":" care","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.94155133Z","response":",","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:52.984257659Z","response":" and","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.027211701Z","response":" develop","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.070371147Z","response":" new","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.113104745Z","response":" treatments","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.155502435Z","response":".\n","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.198324426Z","response":"4","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.242212111Z","response":".","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.286168873Z","response":" Personal","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.328821172Z","response":"ization","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.372268256Z","response":":","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.41580397Z","response":" AI","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.458318255Z","response":" can","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.500160021Z","response":" personalize","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.543572825Z","response":" experiences","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.587228695Z","response":" for","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.631357122Z","response":" individuals","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.673785519Z","response":",","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.716550382Z","response":" such","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.759073575Z","response":" as","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.802802191Z","response":" recommending","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.846078719Z","response":" products","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.889614436Z","response":" or","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.932993314Z","response":" services","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:53.975698652Z","response":" based","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.018979444Z","response":" on","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.062690209Z","response":" their","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.105562114Z","response":" preferences","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.149366191Z","response":".\n\n","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.192435142Z","response":"Negative","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.234517274Z","response":" Imp","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.278046076Z","response":"lications","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.321349574Z","response":":\n","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.36386919Z","response":"1","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.40732029Z","response":".","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.450289305Z","response":" Job","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.493830342Z","response":" Loss","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.537410005Z","response":"es","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.581644163Z","response":":","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.625712465Z","response":" Automation","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.668752758Z","response":" could","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.710404745Z","response":" lead","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.75364026Z","response":" to","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.796044422Z","response":" job","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.83951495Z","response":" losses","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.883561654Z","response":" in","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.926738489Z","response":" industries","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:54.969984637Z","response":" that","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.012213156Z","response":" are","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.055794225Z","response":" heavily","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.097794867Z","response":" reliant","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.141118696Z","response":" on","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.184799232Z","response":" human","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.228483782Z","response":" labor","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.27194768Z","response":".\n","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.315209636Z","response":"2","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.359149764Z","response":".","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.403341761Z","response":" Privacy","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.445992489Z","response":" Concern","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.4901705Z","response":"s","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.533861815Z","response":":","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.577794835Z","response":" The","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.621967766Z","response":" use","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.665317395Z","response":" of","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.708358218Z","response":" AI","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.751382435Z","response":" involves","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.795199952Z","response":" collecting","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.839025976Z","response":" and","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.882989337Z","response":" processing","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.926333402Z","response":" large","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:55.969204647Z","response":" amounts","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.01424439Z","response":" of","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.056864471Z","response":" data","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.100458594Z","response":",","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.145169664Z","response":" which","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.18961427Z","response":" raises","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.23285911Z","response":" privacy","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.275501291Z","response":" concerns","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.31961471Z","response":".\n","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.363925124Z","response":"3","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.408059385Z","response":".","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.451526429Z","response":" Bias","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.495227765Z","response":":","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.53889327Z","response":" If","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.582741438Z","response":" AI","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.626550568Z","response":" systems","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.670427058Z","response":" are","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.715024409Z","response":" trained","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.759499033Z","response":" on","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.803704667Z","response":" biased","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.845753705Z","response":" data","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.889901547Z","response":" or","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.932397552Z","response":" designed","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:56.975050322Z","response":" with","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.018819746Z","response":" biases","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.062327438Z","response":",","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.106896584Z","response":" they","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.150789653Z","response":" can","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.194036257Z","response":" perpet","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.23762232Z","response":"uate","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.281128273Z","response":" and","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.324742867Z","response":" even","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.370962424Z","response":" amplify","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.414446738Z","response":" existing","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.457310486Z","response":" inequalities","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.500541758Z","response":".\n","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.544805368Z","response":"4","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.58841268Z","response":".","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.630732619Z","response":" Security","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.673484102Z","response":" Ris","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.716244778Z","response":"ks","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.759626668Z","response":":","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.802744265Z","response":" As","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.846343704Z","response":" AI","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.889794855Z","response":" becomes","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.933033509Z","response":" more","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:57.976942553Z","response":" integrated","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.02108403Z","response":" into","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.064815133Z","response":" our","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.108859615Z","response":" daily","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.152820942Z","response":" lives","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.197441645Z","response":",","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.242474832Z","response":" there","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.286958495Z","response":" is","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.331154406Z","response":" a","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.375421259Z","response":" risk","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.420351261Z","response":" that","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.465065497Z","response":" it","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.509184053Z","response":" could","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.552799053Z","response":" be","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.595704746Z","response":" hacked","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.639798653Z","response":" or","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.682607166Z","response":" used","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.725883798Z","response":" malicious","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.769152239Z","response":"ly","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.813435559Z","response":".\n\n","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.857438946Z","response":"It","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.901834207Z","response":"'s","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.945658698Z","response":" important","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:58.988755086Z","response":" to","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.032826006Z","response":" carefully","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.076993666Z","response":" consider","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.120702992Z","response":" the","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.163891933Z","response":" potential","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.207591603Z","response":" consequences","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.250970905Z","response":" of","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.29419844Z","response":" AI","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.338617391Z","response":" and","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.381225621Z","response":" work","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.423825767Z","response":" to","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.466870266Z","response":" mitigate","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.509842351Z","response":" any","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.553690578Z","response":" negative","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.596777567Z","response":" impacts","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.641542418Z","response":" while","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.685202617Z","response":" leveraging","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.728611186Z","response":" its","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.771144397Z","response":" benefits","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.8151526Z","response":".","done":false}
-{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T15:44:59.857800359Z","response":"","done":true,"done_reason":"stop","context":[151644,8948,198,2610,525,1207,16948,11,3465,553,54364,14817,13,1446,525,264,10950,17847,13,151645,198,151644,872,198,3838,525,279,15917,315,15235,30,151645,198,151644,77091,198,15469,702,2176,6785,323,8225,24154,382,35490,14390,10709,510,16,13,58123,66567,25,15235,646,68611,9079,11,17719,3738,1465,323,18392,15024,304,5257,19102,624,17,13,23434,40425,5251,1765,25,15235,646,23643,3460,14713,315,821,6157,323,29257,11,8241,25709,429,646,6051,2664,5480,27746,624,18,13,61449,38335,25,15235,646,1492,16026,57581,18808,803,29257,11,7269,8720,2453,11,323,2225,501,22183,624,19,13,19207,2022,25,15235,646,80838,11449,369,7775,11,1741,438,64674,3871,476,3516,3118,389,862,19322,382,38489,14390,10709,510,16,13,12011,24704,288,25,53778,1410,2990,311,2618,17683,304,19102,429,525,16916,88127,389,3738,9327,624,17,13,18874,51247,82,25,576,990,315,15235,17601,25895,323,8692,3460,14713,315,821,11,892,24886,12345,10520,624,18,13,82990,25,1416,15235,5942,525,16176,389,47661,821,476,6188,448,49083,11,807,646,21585,6292,323,1496,96068,6350,92234,624,19,13,8234,53363,2787,25,1634,15235,9044,803,18250,1119,1039,7298,6305,11,1052,374,264,5214,429,432,1410,387,46839,476,1483,38170,398,382,2132,594,2989,311,15516,2908,279,4650,15917,315,15235,323,975,311,49360,894,8225,24905,1393,76482,1181,7567,13],"total_duration":10316687691,"load_duration":12720446,"prompt_eval_count":36,"prompt_eval_duration":53454000,"eval_count":236,"eval_duration":10207910000}
-
-#+end_example
 
 ** Streaming
 Its one thing to read everything into a buffer and then output it, its another to take care of the stream.
@@ -426,6 +192,558 @@ It's important to carefully consider the potential consequences of AI and work t
 #+end_example
 
 
+
+* Defining what i want
+
+** Data openrouter
+First we need the communication /endpoint/
+an endpoint is defined by what is needed to connect to some
+
+#+begin_src python
+
+
+  openrouter_endpoint = {
+      "host": "https://openrouter.ai/api/v1/chat/completions",
+  }
+#+end_src
+
+In order to have some meaningful communication the /endpoint/ needs to
+be in composition with headers, different endpoints needs different headers.
+
+#+begin_src python
+
+  openrouter_headers = {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_OPENROUTER_API_KEY",
+      "HTTP-Referer": "YOUR_SITE_URL",
+      "X-Title": "YOUR_APP_NAME"
+  }
+#+end_src
+
+The /body/ needs includes both required and optional parameters
+#+begin_src python
+    openrouter_params = {
+      # Required parameters
+      "model": "mistralai/ministral-8b",
+      # Either "messages" or "prompt" is required
+      "messages": [],  # List of message dictionaries
+
+      # Optional parameters with default values
+      "max_tokens": None,  # Integer, e.g., 1024
+      "temperature": 0.7,  # Float between 0-2
+      "top_p": 0.95,  # Float between 0-1
+      "top_k": None,  # Integer
+      "presence_penalty": 0.0,  # Float between -2.0 and 2.0
+      "frequency_penalty": 0.0,  # Float between -2.0 and 2.0
+      "stop": None,  # List of strings or None
+      "tools": None,  # List of tool definitions
+      "tool_choice": None,  # String or object
+      "response_format": None,  # Dictionary, e.g., {"type": "json_object"}
+      "seed": None,  # Integer for reproducibility
+      "transforms": None,  # List of transformation rules
+      "stream": False  # Boolean
+  }
+
+#+end_src
+
+Some of these are actually structures them selfs.
+For example messages.
+
+
+#+begin_src python
+  message_structure = {
+      "role": "user",  # or "system", "assistant"
+      "content": "Your message here"
+  }
+
+#+end_src
+
+or as tool use
+#+begin_src python
+  tools_structure = {
+    "type": "function",
+    "function": {
+        "name": "function_name",
+        "description": "function description",
+        "parameters": {
+            "type": "object",
+            "properties": {}
+        }
+    }
+}
+#+end_src
+
+
+So we see some kind of structure of a request.
+
+#+begin_src artist
+                            1      +---------+    1
+                      +------------| Request |-------------+
+                      v            +---------+             v
+                +-------------+                       +----------+
+                | Parameters  |                       | Endpoint |
+                | - model ... |                       | - url    |
+                +-------------+                       +----------+
+            0..n      |   1..n                             | 1
+      +---------------+------------+                       +----+
+      v                            v                            v
+  +-------------+           +-------------+            +------------------+
+  | Tools       |           |  Messages   |            | Header           |
+  | - type      |           |  - role     |            | - content-type   |
+  | - function  |           |  - content  |            | - authorization  |
+  +-------------+           +-------------+            +------------------+
+         | 1..n                                                 |
+  +------v------+                                      +--------v-------+
+  | Argument    |                                      |ContentTypeEnum |
+  | - parameters|                                      | - form-data    |
+  | ... TBD     |                                      | - json         |
+  +-------------+                                      +----------------+
+
+#+end_src
+
+This is somewhat a design descision. But this kind of make sense.
+Its somewhat different for /ollama/ where the parameters are reffered to as options.
+While in openrouter (or openAi api), its part of the request.
+
+The question is how do we make this apparent, or maybe more transparent?
+
+First of all we have a request.
+This is more of an abstract structure, it doesnt contain any data. While it is a compsition
+of other data.
+
+
+** Data Ollama
+
+#+begin_src python
+  ollama_endpoint = {
+      "url": "http://localhost:11434/api/generate"
+  }
+
+  ollama_header = {
+      "Content-Type": "application/json",
+      "Client-Request-ID": "23040",
+      "Authorization": "Basic SECRET"
+  }
+#+end_src
+
+
+* Using structure.
+
+First lest se consisder that the endpoint would basically not be changed a lot.
+In an ideal world I would like to se something like
+
+
+
+\[
+endpoint\_fn = create\_end\_point("https://....")
+\rightarrow add\_header(header)
+\rightarrow add\_options(my\_options)
+\rightarrow add\_tools(my\_tools)
+\]
+
+\[
+maybe\_response = endpoint\_fn
+\rightarrow add\_message(message\_roles)
+\rightarrow add\_message(message\_history)
+\rightarrow add\_message(new\_message)
+\rightarrow send
+\]
+
+The idea is that every =create_*= function returns a =Maybe[Request]=
+
+#+NAME: Maybe
+#+HEADER: :results output raw :exports both :session maybe  :wrap example
+#+begin_src python
+  from typing import TypeVar, Generic, Callable
+  from copy import deepcopy
+
+  T = TypeVar('T')
+  U = TypeVar('U')
+
+  class Maybe(Generic[T]):
+      def __init__(self, args: T, is_ok: bool = True):
+           "docstring"
+           self.val = args
+           self.is_ok:bool = is_ok
+
+
+
+      def bind(self , fn: Callable[[T], 'Maybe[U]']) -> 'Maybe[U]':
+
+          if self.is_ok:
+              return fn(self.val)
+          else:
+              return self.val
+
+      def __eq__(self, other):
+          """
+          Compare two Maybe instances for equality.
+          """
+          if isinstance(other, Maybe):
+              return self.is_ok == other.is_ok and self.val == other.val
+          elif isinstance(other, bool):
+              return self.is_ok == other #and (self.val is None if not other else True)
+          return False
+
+
+      def __repr__(self):
+          return f"Maybe(val={self.val}, is_ok={self.is_ok})"
+
+
+
+  def error(Error: T):
+      # make a deepcopy
+      return Maybe(deepcopy(Error), False)
+
+  def ok(val: T):
+      #make a deepcopy
+      return Maybe(deepcopy(val), True)
+
+
+
+  def create(string: str) -> 'Maybe[T]' :
+      if string is not None:
+          return ok(string)
+      else:
+          return error("Empty string")
+
+
+  def concat(original: str):
+
+      def concat_fn(added: str) -> 'Maybe[T]':
+          return ok(original + added)
+      return concat_fn
+
+
+
+
+
+  print(create("Hello") \
+        .bind(concat("Fisk"))
+        )
+
+
+  if error("NO!") == False:
+      print(f"Not ok but ok")
+  if ok("Something good" == True):
+      print("Working")
+
+
+#+end_src
+
+#+RESULTS: Maybe
+#+begin_example
+Maybe(val=FiskHello, is_ok=True)
+Not ok but ok
+Working
+#+end_example
+
+
+This looks very much like the =pymonads= which wasn't my intention, anyway..
+So what will I gain and why?
+
+The problem arise when there are several different paths.
+consider this example
+
+#+begin_src artist
+
+  +----------+
+  |   fn     |
+  +----------+
+        |
+        |
+        |
+        o---+
+        |   |
+        |   o---+
+        |   |   |
+        |   |   |
+        |   |   o---+
+        |   |   |   |
+        |   |   |   |
+        |   |   |   o---+
+        |   |   |   |   |
+        |   |   |   |   |
+        |   |   |   |   o---+
+        |   |   |   |   |   |
+       1|  2|  3|  4|  5|  6|
+        v   v   v   v   v   v
+
+#+end_src
+
+There are six paths out of this function, in this case just one that is ok (6).
+Each returns a value indicating if was ok or not, and why it failed (1..5)
+The problem is that it gets really messsy after a while, and it becomes really hard to follow.
+
+So what could we do instead?
+Well , one option if there are no calulation in between to have everything in enclosed by and
+#+begin_src artist
+
+  +--------+
+  |   fn   |
+  +--------+
+       |
+       |
+       o and o and o and o and o
+       |                     |
+  1..5 v                   6 v
+
+#+end_src
+
+This would maybe clearify what was good, and not, though we are
+missing the part what kind of error, and any extension would become quite hard to follow.
+
+this would be something like
+#+begin_src python
+
+
+  if exp and exp and exp and exp and exp:
+      return 6
+  else:
+      return ....(1..5?)
+
+#+end_src
+
+Now if we consider this to be a beltline instead.
+
+
+#+begin_src artist
+
+
+   +--------+                          6
+   |  fn    |-->o-->o-->o-->o-->o----------------------> 6
+   +--------+  1|  2|  3|  4|  5|
+                +---+---+---+---+----------------------> 1..5
+
+#+end_src
+
+That looks neater, but what does it mean, and how does it work?  The
+easy way to see it that every =o= is a function returning a meta
+class, for example =Maybe=, Maybe could be either true or false, and
+by providing a pipline to Maybe to bind it to a new function as long
+as Maybe is ok.
+
+in this way we could do something like
+
+#+NAME: py-maybe-example
+#+HEADER: :results output raw :exports both  :session maybe :wrap example
+#+begin_src python :noweb yes
+
+  def add(first_val: int):
+      def add_fn(sec_val: int):
+          return ok(first_val + sec_val)
+      return add_fn
+
+  def mul(first_val: int):
+      def mul_fn(sec_val: int):
+          return ok(first_val*sec_val)
+      return mul_fn
+
+
+
+
+  maybe_val =ok(789) \
+      .bind(add(2)) \
+      .bind(mul(3)) \
+      .bind(add(6))
+
+  # (((789 + 2) * 3)+6)
+  print(maybe_val)
+
+#+end_src
+
+#+RESULTS: py-maybe-example
+#+begin_example
+Maybe(val=2379, is_ok=True)
+#+end_example
+
+So far everything worked correctly, lets add a division.
+
+#+NAME: py-maybe-example1
+#+HEADER: :results output raw :exports both  :session maybe :wrap example
+#+begin_src python
+
+  def div(divisor: int):
+      def div_fn(val: int) -> Maybe[T]:
+          if divisor == 0:
+              return error(f"Cannot divide with zero {val} / {divisor}")
+          else:
+              return ok(val/divisor)
+      return div_fn
+
+
+  maybe_val = ok(789) \
+        .bind(add(2)) \
+        .bind(mul(3)) \
+        .bind(add(6)) \
+        .bind(div(3))
+
+  print(maybe_val)
+  maybe_val = ok(789) \
+        .bind(add(2)) \
+        .bind(mul(3)) \
+        .bind(add(6)) \
+        .bind(div(0))
+
+  print(maybe_val)
+
+
+
+
+
+#+end_src
+
+#+RESULTS: py-maybe-example1
+#+begin_example
+Maybe(val=793.0, is_ok=True)
+Maybe(val=Cannot divide with zero 2379 / 0, is_ok=False)
+#+end_example
+
+In the example =val= was an int and =Error= was a string ,
+But we are not bound to that.
+Quite often we want to use some kind of tracing facility.
+For example how can we see what numbers were actually calculated , kind of a trace back.
+First of all lets create a simple =TracerResult=, class.
+
+The idea of the class is simple, it holds the =value=, and a =trace_log=.
+
+The value is the current value of the calculation and the trace_log is a list of
+how we got to the value.
+
+
+#+NAME: trace-py-example
+#+HEADER: :results output raw :exports both  :session maybe :wrap example
+#+begin_src python
+  from functools import reduce
+  import copy
+
+  class TracerResult(Maybe):
+      def __init__(self, args: T, trace_log: list = None, is_ok: bool = True):
+          super().__init__(args, is_ok)
+          self.trace_log = trace_log if trace_log is not None else []
+
+      def bind(self, fn: Callable[[T], 'TracerResult[U]']) -> 'TracerResult[U]':
+          if self.is_ok:
+              result = fn(self.val)
+              new_trace_log = self.trace_log + [f"{fn.__name__}({self.val}) -> {result.val}"]
+              return TracerResult(result.val, new_trace_log, result.is_ok)
+          else:
+              return TracerResult(self.val, self.trace_log, is_ok=False)
+
+      def __repr__(self):
+          return f"TracerResult(val={self.val}, trace_log={self.trace_log}, is_ok={self.is_ok})"
+
+
+  # Example usage:
+  def add(first_val: int):
+      def add_fn(sec_val: int):
+          return TracerResult(first_val + sec_val)
+      return add_fn
+
+  def mul(first_val: int):
+      def mul_fn(sec_val: int):
+          return TracerResult(first_val * sec_val)
+      return mul_fn
+
+  maybe_val = TracerResult(789) \
+      .bind(add(2)) \
+      .bind(mul(3)) \
+      .bind(add(6)) \
+      .bind(div(3))
+
+  print(maybe_val)
+
+  maybe_val = TracerResult(789) \
+        .bind(add(2)) \
+        .bind(div(0)) \
+        .bind(add(6)) \
+        .bind(div(3))
+
+  print(maybe_val)
+
+#+end_src
+
+#+RESULTS: trace-py-example
+#+begin_example
+TracerResult(val=793.0, trace_log=['add_fn(789) -> 791', 'mul_fn(791) -> 2373', 'add_fn(2373) -> 2379', 'div_fn(2379) -> 793.0'], is_ok=True)
+TracerResult(val=Cannot divide with zero 791 / 0, trace_log=['add_fn(789) -> 791', 'div_fn(791) -> Cannot divide with zero 791 / 0'], is_ok=False)
+#+end_example
+
+I clearly got distracted from the real purpose here. So, lets get back to the original
+
+** Create a request
+
+In the [[id:e8af6a4d-90dd-4aac-bb72-044638fb6b0f][Visual approach]] it shows the setup for [[https://openrouter.ai/docs/quick-start][openrouter.ai]] that means
+we need a function for creating openrouter request, this is the top boundary layer
+It needs all the classes to be done. Though not all fields.
+
+#+NAME: openrouter-create
+#+HEADER: :results output raw :exports both   :wrap example
+#+begin_src python :dir "~/data/src/github/frr_plotter_2024/"
+      from col.comm.piper import (Request, Message, Parameters,
+                                  create_openrouter_request)
+
+      user_message = Message(role="user", content="which fruit or vegetables have most vitamine-c?")
+      system_message= Message(role="System" , content="You are an expert in vegteables" )
+
+      # req_data = create_openrouter_request(url="https://openrouter.ai/api/v1",
+      #                                      key="apapa",
+      #                                      model="google/gemini-2.0-flash-thinking-exp:free",
+      #                                      messages=[user_message,system_message])
+
+      model="google/gemini-2.0-flash-thinking-exp:free"
+
+      parameters = Parameters( messages=[user_message,system_message],
+                               tools=None, model=model)
+      print(parameters)
+
+
+
+#+end_src
+
+#+RESULTS: openrouter-create
+#+begin_example
+
+Parameters(model=google/gemini-2.0-flash-thinking-exp:free,
+messages:
+user: which fruit or vegetables have most vitamine-c?
+System: You are an expert in vegteables,
+params={'max_tokens': None, 'temperature': 0.7, 'top_p': 0.95, 'top_k': None, 'presence_penalty': 0.0, 'frequency_penalty': 0.0, 'stop': None, 'tools': None, 'tool_choice': None, 'response_format': None, 'seed': None, 'transforms': None, 'stream': False})
+
+#+end_example
+
+I intentionally set the =tools= to none this time, since i need to figure out how to deal with tools.
+
+** TODO Header
+#+NAME: header-work
+#+HEADER: :results output raw :exports both   :wrap example
+#+begin_src python :dir "~/data/src/github/frr_plotter_2024/"
+  from col.comm.piper import (Headers,ContentType)
+
+  header = Headers(ContentType.JSON,
+         {"Hello" : "World",
+          "Authorization": "Bearer 1234"
+          })
+
+  print(header)
+
+
+#+end_src
+
+#+RESULTS: header-work
+#+begin_example
+Content-type: application/json
+Hello: World
+Authorization: Bearer 1234
+#+end_example
+
+** TODO Tools
+Tools are the greates
+
 * Resources
 [[https://github.com/ollama/ollama/blob/main/docs/api.md][Ollama API]]
 [[https://openrouter.ai/docs/requests][openrouter API]]
+
+[[https://www.perplexity.ai/search/when-communicating-with-ollama-7cGu86RKQ4a.krw6ewzosQ][Perplexity]]
+eww
+>
