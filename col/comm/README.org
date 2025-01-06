@@ -715,6 +715,8 @@ params={'max_tokens': None, 'temperature': 0.7, 'top_p': 0.95, 'top_k': None, 'p
 I intentionally set the =tools= to none this time, since i need to figure out how to deal with tools.
 
 ** TODO Header
+The representation is just a string, but what we are after is
+to use a jinja2 template.
 #+NAME: header-work
 #+HEADER: :results output raw :exports both   :wrap example
 #+begin_src python :dir "~/data/src/github/frr_plotter_2024/"
@@ -736,6 +738,25 @@ Content-type: application/json
 Hello: World
 Authorization: Bearer 1234
 #+end_example
+
+In the case of header, there is no need to create a template at this
+time, since its basically looks the same in every request.
+
+But here is the idea, in an abstract way we want to transform the input to some kind of ouput
+
+
+#+begin_src example
+  convert :: (a -> b) -> (a -> Maybe b)
+
+  convert: (T->Maybe U) -> T -> Maybe U
+#+end_src
+
+The converter takes a unit of type T and a function =T->Maybe U=
+That means we can use any converter.
+
+ U in this case could be a json string or some other
+
+ Actually we want to make this a
 
 ** TODO Tools
 Tools are the greates
