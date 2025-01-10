@@ -1,0 +1,22 @@
+1	M-GHT	Pontus Råhlin (BON)	SZR	Mas
+1 m .511 s	18 m 35.400 s 258w @4.20WKG	728	0	728	(0)	(0)	1.456
+1	M-GHT	Mattias Sjöberg [SZ] (GHT	SZ	Vet
+1 m 9.718 s	18 m 44.607 s 284w @4.00WKG	712	0	712	(0)	(0)	1.424
+1	M-GHT	Calle Olsen [SZ]        SZ	50+
+1 m 10.576 s	18 m 45.465 s 253w @4.00WKG	704	0	704	(0)	(0)	1.408
+1	M-GHT	Thomas K.Rydeker [SZ]	SZ	Vet
+1 m 22.033 s	18 m 56.922 s 266w @3.90WKG	668	0	668	(0)	(0)	1.336
+1	M-GHT	Henrik Tullborg [SZ]	SZ	50+
+1 m 24.127 s	18 m 59.016 s 307w @3.80WKG	668	0	668	(0)	(0)	1.336
+3	M-GHT	Pontus Råhlin (GHT)	SZR	Mas
+32.646 s	1 hrs, 1 m 13.338 s 223w @3.60WKG	910	191	368	(0)	(0)	1.469
+3	M-GHT	Mattias Sjöberg [SZ] (GHT	SZ	Vet
+Winner	1 hrs, 1 m 33.765 s 253w @3.60WKG	972	178	400	(0)	(0)	1.550
+3	M-GHT	Henrik Tullborg [SZ]	SZ	50+
+1 m 3.115 s	1 hrs, 2 m 36.880 s 256w @3.20WKG	932	202	364	(0)	(0)	1.498
+3	M-GHT	Calle Olsen [SZ]        SZ	50+
+2 m 2.457 s	1 hrs, 3 m 36.222 s 205w @3.30WKG	882	205	344	(0)	(0)	1.431
+3	M-GHT	Thomas K.Rydeker [SZ](GHT)	SZ	Vet
+1.553 s	1 hrs, 4 m 217w @3.20WKG	940	184	376	(0)	(0)	1.500
+2	M-GHT	Henrik Tullborg [SZ]	SZ	50+
+1 m 20.340 s	47 m 12.907 s 277w @3.50WKG	728	869	752	(0)	(0)	2.349

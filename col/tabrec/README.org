@@ -1,0 +1,27 @@
+* Overview
+A tab record is a record which is separated with tabs.
+Each new record is separated with new line
+for example
+#+NAME: tab_record
+#+begin_example
+1	M-GHT	Pontus Råhlin (BON)	SZR	Mas
+1 m .511 s	18 m 35.400 s 258w @4.20WKG	728	0	728	(0)	(0)	1.456
+1	M-GHT	Mattias Sjöberg [SZ] (GHT	SZ	Vet
+1 m 9.718 s	18 m 44.607 s 284w @4.00WKG	712	0	712	(0)	(0)	1.424
+#+end_example
+
+What do we need to do.
+ 1. Open file. So we need a file as data. But we dont need to pass it around.
+ 2. for each line.
+    1. split with tab
+
+#+NAME: tab-calc
+#+HEADER: :results output raw :exports both :var tbl=tab_record :session tab :wrap example
+#+begin_src python :noweb yes
+
+  def make_table(file_path: str) -> list[list[str]]:
+
+
+
+
+#+end_src
