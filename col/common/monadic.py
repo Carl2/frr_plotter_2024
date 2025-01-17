@@ -67,9 +67,41 @@ class TracerResult(Maybe):
           return f"TracerResult(val={self.val}, trace_log={self.trace_log}, is_ok={self.is_ok})"
 
 
-def convert(transform_fn: callable[T]) -> callable:
-
+def convert(transform_fn: Callable[[T], U]) -> Callable[[T], Maybe[U]]:
     def convert_fn(T) -> Maybe[U]:
         return transform_fn(T)
 
     return convert_fn
+
+
+
+
+def safer_exec(func: Callable) -> Callable:
+    """
+    A decorator that wraps a function to safely handle exceptions.
+
+    This decorator catches any exceptions raised by the function, returning
+    a Maybe instance with the error value if an exception occurs. If the
+    function executes successfully, it wraps the return value in a Maybe
+    instance.
+
+    Usage:
+        @safer_exec
+        def example_function(x: int, y: int) -> int:
+            return x / y  # This can raise a ZeroDivisionError
+
+        result = example_function(10, 0)
+        print(result)  # Output: Maybe(val=ZeroDivisionError, is_ok=False)
+
+    Args:
+        func (Callable): The function to be decorated.
+
+    Returns:
+        Callable: The wrapped function that returns a Maybe instance.
+    """
+    def exec_safe(**kwargs):
+        try:
+            return Maybe(func(**kwargs))
+        except Exception as e:
+            return Maybe(args=e, is_ok=False)
+    return exec_safe

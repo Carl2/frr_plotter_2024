@@ -4,6 +4,7 @@ from datetime import timedelta
 from functools import reduce
 from pymonad.maybe import Maybe, Just, Nothing
 from icecream import ic
+from pdb import set_trace
 import pandas as pd
 
 
@@ -107,4 +108,10 @@ if __name__ == '__main__':
     ic(split_by("+6 m 48.655 s", ["+", "m", "s"]))
     ic(split_by("", ["+", "m", ".", "s"]))
     ic(split_by("1 hrs, 9 m 43.929 s 268w @3.30WKG,",['hrs,', 'm', 's','w','@','WKG'] ))
+
+
+    ic(split_by('1 hrs, 4 m 217w @3.20WKG', ['hrs,', 'm','.', 's', 'w', '@', 'WKG']))
+
+    ic(split_by('1 hrs, 4 m 217w @3.20WKG', ['hrs', 'm','s','w', '@', 'WKG']))
+    ic(split_by('1 hrs, 3 m 36.222 s 205w @3.30WKG', ['hrs,', 'm','s','w', '@', 'WKG']))
     print("Done")
