@@ -24,8 +24,6 @@ def split_on_fn(delimiter: str) -> Callable[[str], Maybe]:
 
 
 
-
-
 def parse_time_str(time_str):
     part = split_by(time_str, ["hrs,", "m", ".", "s"])
     hours = convert_to_val(part[0])
@@ -50,14 +48,25 @@ def merge_lines(init: dict, line)->dict:
 
 
 
-def convert_to_val(val: str) -> int:
+def convert_to_val(val: str) -> Maybe:
     if val is not None and len(val) > 0:
-        return int(val)
-    return 0
+        try:
+            return Maybe(int(val))
+        except Exception as e:
+            return Maybe(f"Unable to convert {str} to int", is_ok=False)
+    return Maybe(0)
 
-def convert_str_array_to_int(arr: list[str])->list[int]:
-    return [convert_to_val(item) for item in arr]
 
+def convert_str_array_to_int(arr: list[str]) -> Maybe[list[int]]:
+    if not arr:
+        return Maybe(f"Failed to convert empty array to int", is_ok=False)
+
+    try:
+        vals = [convert_to_val(str_val).or_else(lambda x: Maybe(0)).val
+                for str_val in arr]
+        return Maybe(vals)
+    except ValueError:
+        return Maybe(f"Failed to convert array {arr} to integers", is_ok=False)
 
 def parse_effort(effort_str):
     ic(effort_str)
@@ -75,32 +84,51 @@ def parse_effort(effort_str):
 
     """
     part=split_by(effort_str, ['hrs,', 'm','s','w', '@', 'WKG'])
-    hours = convert_to_val(part[0])
-    minutes = convert_to_val(part[1])
+    hours = convert_to_val(part[0]).val
+    minutes = convert_to_val(part[1]).val
     time_delta = timedelta(hours=hours, minutes=minutes)
 
     splitter = split_on_fn('.')
-    maybe_secods = splitter(line=part[2]).map(convert_str_array_to_int)
+    maybe_seconds = splitter(line=part[2]).bind(convert_str_array_to_int)
 
-    if maybe_secods == True:
-        time_delta += timedelta(seconds=maybe_secods.val[0], milliseconds=maybe_secods.val[1])
+    if maybe_seconds == True:
+        time_delta += timedelta(seconds=maybe_seconds.val[0], milliseconds=maybe_seconds.val[1])
 
     watts = int(part[3])
     wkg = float(part[5])
     return watts,wkg,time_delta
 
 
+
+
+
+
+
 def parse_egap(egap_str: str)->timedelta:
     ic(egap_str)
     td = timedelta(seconds = 0)
     if egap_str.lower() != 'Winner':
-        hours,minutes,seconds, milli = split_by(egap_str, ['hrs,','m','.','s'])
-        ic(hours,minutes,seconds, milli)
+        hours,minutes,seconds_str = split_by(egap_str, ['hrs,','m','s'])
+
+        dot_splitter = split_on_fn('.')
+        maybe_seconds = dot_splitter(seconds_str) \
+            .bind(convert_str_array_to_int) \
+            .or_else(lambda x: Maybe(0))
+
+
+        ic(maybe_seconds)
+        ic(hours,minutes,seconds)
         td = timedelta(
             hours=convert_to_val(hours),
-            minutes=convert_to_val(minutes),
-            seconds=convert_to_val(seconds),
-            milliseconds=convert_to_val(milli))
+            minutes=convert_to_val(minutes))
+            #maybe_seconds[0].or_else(lambda x: Maybe(0)).val,
+            #milliseconds=maybe_seconds[1].or_else(lambda x: Maybe(0)).val)
+
+        #td = timedelta()
+        # if maybe_seconds == True:
+        #     td += timedelta(seconds=maybe_seconds.val[0], milliseconds=maybe_seconds.val[1])
+
+
     return td
 
 

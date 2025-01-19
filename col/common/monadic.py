@@ -35,6 +35,16 @@ class Maybe(Generic[T]):
         else:
             return Maybe(result)
 
+
+    def or_else(self, else_fn: Callable[[T],U] )->'Maybe[U]':
+        if self.is_ok:
+            return self
+        else:
+            return else_fn(self.val)
+
+
+
+
     def __eq__(self, other):
         """
         Compare two Maybe instances for equality.
