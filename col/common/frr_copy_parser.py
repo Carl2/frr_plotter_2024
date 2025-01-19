@@ -12,6 +12,8 @@ from typing import Callable
 
 def split_on_fn(delimiter: str) -> Callable[[str], Maybe]:
 
+    # Actually this should return not only the fields , maybe a tuple
+    # of how many fields.
     def split_on(line: str) -> Maybe:
         if line is not None:
             fields = line.split(delimiter)
@@ -117,7 +119,7 @@ def parse_egap(egap_str: str)->timedelta:
 
 
         ic(maybe_seconds)
-        ic(hours,minutes,seconds)
+        ic(hours,minutes,maybe_seconds)
         td = timedelta(
             hours=convert_to_val(hours),
             minutes=convert_to_val(minutes))
