@@ -46,8 +46,6 @@ def merge_lines(init: dict, line)->dict:
 
 
 
-
-
 def convert_to_val(val: str) -> Maybe:
     if val is not None and len(val) > 0:
         try:
@@ -56,8 +54,16 @@ def convert_to_val(val: str) -> Maybe:
             return Maybe(f"Unable to convert {str} to int", is_ok=False)
     return Maybe(0)
 
-
 def convert_str_array_to_int(arr: list[str]) -> Maybe[list[int]]:
+    """Converts a list of strings to a list of integers.
+
+    Args:
+        arr (list[str]): A list containing string representations of integers.
+
+    Returns:
+        Maybe[list[int]]: A Maybe object containing a list of integers if conversion is successful,
+                          or an error message if the conversion fails or the input list is empty.
+    """
     if not arr:
         return Maybe(f"Failed to convert empty array to int", is_ok=False)
 
@@ -67,6 +73,7 @@ def convert_str_array_to_int(arr: list[str]) -> Maybe[list[int]]:
         return Maybe(vals)
     except ValueError:
         return Maybe(f"Failed to convert array {arr} to integers", is_ok=False)
+
 
 def parse_effort(effort_str):
     ic(effort_str)
@@ -99,12 +106,6 @@ def parse_effort(effort_str):
     return watts,wkg,time_delta
 
 
-
-
-
-from typing import Optional
-from datetime import timedelta
-
 def to_timedelta( hours: Maybe, minutes: Maybe, seconds_result: list[int]) -> timedelta:
 
     if seconds_result.is_ok:
@@ -130,39 +131,27 @@ def parse_egap(egap_str: str)->timedelta:
 
         td = to_timedelta(hours,minutes,maybe_seconds)
 
-
-        ic(maybe_seconds,td)
-        ic(hours,minutes,maybe_seconds)
-        # td = timedelta(
-        #     hours=convert_to_val(hours),
-        #     minutes=convert_to_val(minutes))
-            #maybe_seconds[0].or_else(lambda x: Maybe(0)).val,
-            #milliseconds=maybe_seconds[1].or_else(lambda x: Maybe(0)).val)
-
-        #td = timedelta()
-        # if maybe_seconds == True:
-        #     td += timedelta(seconds=maybe_seconds.val[0], milliseconds=maybe_seconds.val[1])
-
-
     return td
 
 
-
-
-
 def make_performance_dataframe(list_fields: list[list[str]]):
-    # 0 - stage, 1 - class, 3 - name, 2 - club , 5 - exp, 4 - egap,
-    # 6 - effort, 7 - Polka, 8 - sprint , 9 - finish, 10- vbw, 11- upg, 12- total
-    header = ['stage', 'class', 'name','club',  'exp', 'egap', 'effort', 'polka', 'sprint', 'finish', 'vbw', 'upg', 'total' ]
+    """
+    Converts a list of performance fields into a structured DataFrame.
 
+    Args:
+        list_fields (list[list[str]]): A list of lists where each inner list contains performance data.
+
+    Returns:
+        pd.DataFrame: A DataFrame with parsed performance data including additional calculated columns.
+    """
+    header = ['stage', 'class', 'name', 'club', 'exp', 'egap', 'effort', 'polka', 'sprint', 'finish', 'vbw', 'upg', 'total']
     df = pd.DataFrame(data=list_fields, columns=header)
     new_columns = df['effort'].apply(parse_effort).apply(pd.Series)
     new_columns.columns = ['watts', 'wkg', 'time_delta']
     df = pd.concat([df, new_columns], axis=1)
-
-    egap_columns = df['egap'].apply(parse_egap)
-
+    df['egap_td'] = df['egap'].apply(parse_egap)
     return df
+
 
 def parse_lines(content: list[str]):
     vals= reduce(merge_lines,content,{"line_nr":1, "output": []})

@@ -130,40 +130,26 @@ class TestFrrParser(unittest.TestCase):
         ic(vals)
 
     def test_parse_egap(self):
-    #     # Test various formats of egap strings
-        # set_trace()
-        # ic(parse_egap('10 s'))
-    #     #In this case we have a problem.
-    #     # since the split by consists of ['hrs','m','s']
-    #     #
-    #     set_trace()
-    #     arr = parse_egap('1 m .511 s')
-    #     # We should get array
-
-    #     ic(parse_egap('1 m .511 s'))
-    #     ic(parse_egap('1.553 s'))
         test_cases = [
-            # ('1 m 3.115 s', timedelta(seconds=63, microseconds=115000)),
-            # ('32.646 s', timedelta(seconds=32, microseconds=646000)),
-            # ('1 m', timedelta(minutes=1)),
-            # ('Winner', timedelta(minutes=0)),
-            # # Additional test cases
-            # ('2 hrs, 30 m 15.500 s', timedelta(hours=2,
-            #                                    minutes=30,
-            #                                    seconds=15,
-            #                                    milliseconds=500)),
-            # ('45 m 20.200 s', timedelta(minutes=45,
-            #                             seconds=20,
-            #                             milliseconds=200)),
-            # ('0 hrs, 0 m 0.000 s', timedelta()),
-            # ('1.553 s', timedelta(seconds=1, microseconds=553000)),
-            # # ('10 s', timedelta(seconds=10)),
-            # ('Winner', timedelta(minutes=0)),
+            ('1 m 3.115 s', timedelta(seconds=63, microseconds=115000)),
+            ('32.646 s', timedelta(seconds=32, microseconds=646000)),
+            ('1 m', timedelta(minutes=1)),
+            ('Winner', timedelta(minutes=0)),
+            # Additional test cases
+            ('2 hrs, 30 m 15.500 s', timedelta(hours=2,
+                                               minutes=30,
+                                               seconds=15,
+                                               milliseconds=500)),
+            ('45 m 20.200 s', timedelta(minutes=45,
+                                        seconds=20,
+                                        milliseconds=200)),
+            ('0 hrs, 0 m 0.000 s', timedelta()),
+            ('1.553 s', timedelta(seconds=1, microseconds=553000)),
             # ('10 s', timedelta(seconds=10)),
-            ('1 m .511 s', timedelta(seconds=60, milliseconds=511000)),
+            ('Winner', timedelta(minutes=0)),
+            ('10 s', timedelta(seconds=10)),
+            ('1 m .511 s', timedelta(seconds=60, milliseconds=511)),
         ]
 
         for egap_str, expected in test_cases:
-            set_trace()
-            ic(expected)
             self.assertEqual(parse_egap(egap_str), expected)
