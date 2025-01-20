@@ -12,8 +12,6 @@ from typing import Callable
 
 def split_on_fn(delimiter: str) -> Callable[[str], Maybe]:
 
-    # Actually this should return not only the fields , maybe a tuple
-    # of how many fields.
     def split_on(line: str) -> Maybe:
         if line is not None:
             fields = line.split(delimiter)
@@ -104,6 +102,18 @@ def parse_effort(effort_str):
 
 
 
+from typing import Optional
+from datetime import timedelta
+
+def to_timedelta( hours: Maybe, minutes: Maybe, seconds_result: list[int]) -> timedelta:
+
+    if seconds_result.is_ok:
+        seconds = seconds_result.val[0] if len(seconds_result.val) > 0 else 0
+        milliseconds = seconds_result.val[1] if len(seconds_result.val) > 1 else 0
+
+    total_hours = convert_to_val(hours).val
+    total_minutes = convert_to_val(minutes).val
+    return timedelta(hours=total_hours, minutes=total_minutes, seconds=seconds, milliseconds=milliseconds)
 
 
 def parse_egap(egap_str: str)->timedelta:
@@ -115,14 +125,17 @@ def parse_egap(egap_str: str)->timedelta:
         dot_splitter = split_on_fn('.')
         maybe_seconds = dot_splitter(seconds_str) \
             .bind(convert_str_array_to_int) \
-            .or_else(lambda x: Maybe(0))
+            .or_else(convert_str_array_to_int) \
 
 
-        ic(maybe_seconds)
+        td = to_timedelta(hours,minutes,maybe_seconds)
+
+
+        ic(maybe_seconds,td)
         ic(hours,minutes,maybe_seconds)
-        td = timedelta(
-            hours=convert_to_val(hours),
-            minutes=convert_to_val(minutes))
+        # td = timedelta(
+        #     hours=convert_to_val(hours),
+        #     minutes=convert_to_val(minutes))
             #maybe_seconds[0].or_else(lambda x: Maybe(0)).val,
             #milliseconds=maybe_seconds[1].or_else(lambda x: Maybe(0)).val)
 
