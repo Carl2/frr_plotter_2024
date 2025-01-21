@@ -7,6 +7,7 @@ import pandas as pd
 from datetime import timedelta
 from col.common.monadic import safer_exec,Maybe
 from col.common.split_by import split_by
+from col.common.utils import convert_to_val
 from typing import Callable
 
 
@@ -44,15 +45,6 @@ def merge_lines(init: dict, line)->dict:
     line_nr +=1
     return {"line_nr": line_nr, "output": output_arr}
 
-
-
-def convert_to_val(val: str) -> Maybe:
-    if val is not None and len(val) > 0:
-        try:
-            return Maybe(int(val))
-        except Exception as e:
-            return Maybe(f"Unable to convert {str} to int", is_ok=False)
-    return Maybe(0)
 
 def convert_str_array_to_int(arr: list[str]) -> Maybe[list[int]]:
     """Converts a list of strings to a list of integers.
