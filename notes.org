@@ -2,3 +2,14 @@
 ** TODO Make plots
   [2025-01-20 mån]
   [[file:~/git/frr_plotter_2024/col/common/frr_copy_parser.py]]
+** TODO Plot names
+  [2025-01-21 tis]
+  [[file:~/git/personal/frr_plotter_2024/col/common/frr_copy_parser.py::header = \['stage', 'class', 'name', 'club', 'exp', 'egap', 'effort', 'polka', 'sprint', 'finish', 'vbw', 'upg', 'total'\]]]
+
+
+  Currently the plotting is done by 'Name','Stage' but i've made a
+  small misstake.  by providing the wrong in the new this time its
+  'name', 'stage' (lower).  This prevents me from using it.  The easy
+  way is to fix it and call it the same thing, its not beautiful, but
+  it works.  the other way is to get the name and stage with somekind
+  of function or as somekond of input to the =make_stage_plot_by_name=
