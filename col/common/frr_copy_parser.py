@@ -126,6 +126,12 @@ def parse_egap(egap_str: str)->timedelta:
     return td
 
 
+def parse_score(score_str: str) -> int:
+    if "." in score_str:
+        score_str = score_str.replace(".", "")
+    return int(score_str)
+
+
 def make_performance_dataframe(list_fields: list[list[str]]):
     """
     Converts a list of performance fields into a structured DataFrame.
@@ -142,6 +148,10 @@ def make_performance_dataframe(list_fields: list[list[str]]):
     new_columns.columns = ['watts', 'wkg', 'time_delta']
     df = pd.concat([df, new_columns], axis=1)
     df['egap_td'] = df['egap'].apply(parse_egap)
+    df['polka'] = df['polka'].apply(parse_score)
+    df['sprint'] = df['sprint'].apply(parse_score)
+    df['total'] = df['total'].apply(parse_score)
+
     return df
 
 
