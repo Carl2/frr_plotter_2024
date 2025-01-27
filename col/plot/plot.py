@@ -4,21 +4,41 @@ from pandas.core.groupby.generic import DataFrameGroupBy
 from functools import reduce
 import pandas as pd
 import matplotlib.pyplot as plt
-from typing import Callable
+from typing import Callable,TypeVar
+from copy import deepcopy
 
 T = TypeVar('T')
 U = TypeVar('U')
-def make_plot_handler(converter: Callable[[U],T])->Callable:
+
+# This function returns a function which
+# will get the value for a certain stage.
+# But the value tends to need to be converted.
+# So the added functionality is the coverter.
+# So for example to get the Times
+# index - The field in question  watt, egap, totals ....
+# data - the dataframe in question
+# value - the value to be inserted into the array ,
+# From the start value is an array with nan values
+
+def make_plot_handler(converter: Callable[[U],T], df_filter: Callable)->Callable:
 
     def handler_fn(init_values: dict, name_group: DataFrameGroupBy):
         data = init_values['data']
-        vals = init_values['times']
+        vals = init_values['value']
         index = init_values['index']
-        stage_value = data[data['stage'] == stage][index]
+        stage_value = df_filter(data, name_group)
         if len(stage_value) != 0:
             vals[int(stage) - 1] = converter(stage_value.iloc[0])
         return init_values
-    # TODO: NOT DONE!
+
+    return handler_fn
+
+
+def filter_by(*, match_field: str, output_field: str ):
+    def filter_fn(df: pd.DataFrame, match_val: T):
+            out =  df[df[match_field] == match_val][output_field]
+            return deepcopy(out)
+    return filter_fn
 
 
 # def make_stage_plot_by_name(df_orig: pd.DataFrame,

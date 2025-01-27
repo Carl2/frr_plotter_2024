@@ -83,7 +83,7 @@ def handle_polka(init_values: dict, name_group: DataFrameGroupBy):
     ax = init_values['ax']
     positions = np.full(len(unique_stages), np.nan)
     rider_vals = reduce(handle_pos_name, unique_stages, {
-        'data': data,
+         'data': data,
         'times': positions,
         'index': 'total'} )
     ax.plot(unique_stages, rider_vals['times'], 'o-', label=name[0])
