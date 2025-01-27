@@ -26,8 +26,9 @@ def make_plot_handler(converter: Callable[[U],T], df_filter: Callable)->Callable
         data = init_values['data']
         vals = init_values['value']
         index = init_values['index']
-        stage_value = df_filter(data, name_group)
+        stage_value = df_filter(data, index)
         if len(stage_value) != 0:
+            # This int(stage-1) needs to be rewritten.
             vals[int(stage) - 1] = converter(stage_value.iloc[0])
         return init_values
 

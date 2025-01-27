@@ -6,7 +6,10 @@ from datetime import datetime
 #from game_engine.data.messages import render_message
 # from src.game_engine.data.messages import render_message, login_message
 from pdb import set_trace
-
+import pandas as pd
+from icecream import ic
+from col.plot.plot import filter_by, make_plot_handler
+import numpy as np
 
 # import pytest
 # import sys  # For modifying sys.path temporarily if necessary
@@ -24,6 +27,30 @@ from col.common.monadic import Maybe
 # class TestPiper(unittest.TestCase):
 #     def test_test(self):
 #         self.assertEqual(fun(1), 2)
+
+def make_df():
+    data = []
+    names = ["Calle Olsen", "Steinar Wagnen", "Erik Berg", "Lars Petter", "Magnus Dahl"]
+
+    # First two riders participate in all stages
+    for stage in range(1, 9):
+        data.append({"name": names[0], "stage": stage, "position": stage % 3 + 1, "watt": 220 + stage * 5})
+        data.append({"name": names[1], "stage": stage, "position": stage % 4 + 2, "watt": 230 + stage * 4})
+
+    # Third rider participates in stages 1-5
+    for stage in range(1, 6):
+        data.append({"name": names[2], "stage": stage, "position": stage % 3 + 3, "watt": 240 + stage * 3})
+
+    # Fourth rider participates in stages 2-6
+    for stage in range(2, 7):
+        data.append({"name": names[3], "stage": stage, "position": stage % 3 + 2, "watt": 250 + stage * 2})
+
+    # Fifth rider participates in stages 4-8
+    for stage in range(4, 9):
+        data.append({"name": names[4], "stage": stage, "position": stage % 3 + 1, "watt": 260 + stage})
+
+    df = pd.DataFrame(data)
+    return df
 
 
 ###############################################################################
@@ -91,3 +118,15 @@ class TestMonadics(unittest.TestCase):
 
         maybe_not_ok = Maybe(10, False)
         self.assertEqual(repr(maybe_not_ok), "Maybe(val=10, is_ok=False)")
+
+    def test_make_plot_handler(self):
+        df = make_df()
+
+        # Make a filter function using filter_by
+        filter_fn = filter_by(match_field='stage', output_field='name')
+        ic(filter_fn(df, 6))
+        ic(df)
+        handler_fn = make_plot_handler(lambda x: x, filter_fn)
+        arr = np.full(5, np.nan)
+        out = handler_fn({"data": df, "value": arr, "index": 3}, df)
+        ic(out)
