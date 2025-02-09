@@ -12,6 +12,8 @@ from icecream import ic
 def convert_to_time_repr(seconds: float):
     return str(timedelta(seconds=seconds))
 
+
+
 def set_ytick_time_label(ax):
     yticks = ax.get_yticks()
     ax.set_yticks(yticks)  # Set the tick positions first
@@ -45,6 +47,8 @@ def handle_egap(init_values: dict, name_group: DataFrameGroupBy):
     set_ytick_time_label(ax)
     init_values[name[0]] = rider_vals['times']
     return init_values
+
+
 
 
 def handle_stage_times(init_values: dict, name_group: DataFrameGroupBy):
