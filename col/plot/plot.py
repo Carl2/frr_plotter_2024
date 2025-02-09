@@ -100,6 +100,7 @@ def handle_generic_plot(init_values: dict,
         >>> result = handle_generic_plot(init_vals, group_data, config)
     """
     name, data = name_group
+    print(f"Debug - name type: {type(name)}, name value: {name}")  # Debug print
     unique_stages = init_values['unique']
     ax = init_values['ax']
     values = np.full(len(unique_stages), np.nan)
@@ -110,8 +111,10 @@ def handle_generic_plot(init_values: dict,
         'index': plot_config.index_field
     })
 
+    full_name = name[0] if isinstance(name, tuple) else name
+    print(f"Debug - full_name: {full_name}")  # Debug print
     ax.plot(unique_stages, rider_vals['times'],
-            plot_config.plot_style, label=name[0])
+            plot_config.plot_style, label=full_name)
     ax.set_xticks(unique_stages)
     ax.set_xlabel('Stages')
     ax.set_ylabel(plot_config.ylabel)
