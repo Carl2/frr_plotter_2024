@@ -59,6 +59,29 @@ class PlotConfig:
 # value - the value to be inserted into the array ,
 # From the start value is an array with nan values
 
+def handle_stage_name(init_values: dict, stage: int) -> dict:
+    """Handle data processing for a single stage.
+
+    Args:
+        init_values: Dictionary containing data and configuration
+        stage: Stage number to process
+
+    Returns:
+        dict: Updated initialization values
+    """
+    data = init_values['data']
+    vals = init_values['times']
+    index = init_values['index']
+    stage_value = data[data['stage'] == stage][index]
+
+    if len(stage_value) != 0:
+        if hasattr(stage_value, 'dt'):
+            val = stage_value.dt.total_seconds().iloc[0]
+        else:
+            val = stage_value.iloc[0]
+        vals[int(stage)-1] = val
+    return init_values
+
 def handle_generic_plot(init_values: dict, 
                        name_group: DataFrameGroupBy, 
                        plot_config: PlotConfig) -> dict:
@@ -105,9 +128,9 @@ def make_plot_handler(converter: Callable[[U],T], df_filter: Callable)->Callable
         data = init_values['data']
         vals = init_values['value']
         index = init_values['index']
+        stage = data['stage'].iloc[0]  # Get stage from the data
         stage_value = df_filter(data, index)
         if len(stage_value) != 0:
-            # This int(stage-1) needs to be rewritten.
             vals[int(stage) - 1] = converter(stage_value.iloc[0])
         return init_values
 
