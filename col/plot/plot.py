@@ -4,11 +4,50 @@ from pandas.core.groupby.generic import DataFrameGroupBy
 from functools import reduce
 import pandas as pd
 import matplotlib.pyplot as plt
-from typing import Callable,TypeVar
+from typing import Callable, TypeVar, Optional
 from copy import deepcopy
+from dataclasses import dataclass
 
 T = TypeVar('T')
 U = TypeVar('U')
+
+@dataclass
+class PlotConfig:
+    """Configuration for plot generation.
+
+    This class encapsulates the configuration needed to generate different types
+    of plots in the cycling race analysis system.
+
+    Attributes:
+        index_field: Field name in the DataFrame to use for plotting.
+        ylabel: Label for the y-axis.
+        y_formatter: Optional function to format y-axis ticks.
+        plot_style: Style string for plot (default: 'o-').
+        figsize: Tuple defining figure dimensions (default: (20, 16)).
+
+    Example:
+        >>> time_config = PlotConfig(
+        ...     index_field='time_delta',
+        ...     ylabel='Time',
+        ...     y_formatter=set_ytick_time_label
+        ... )
+    """
+
+    index_field: str
+    ylabel: str
+    y_formatter: Optional[Callable[[plt.Axes], None]] = None
+    plot_style: str = 'o-'
+    figsize: tuple[int, int] = (20, 16)
+
+    def __post_init__(self) -> None:
+        """Validate configuration after initialization."""
+        if not isinstance(self.index_field, str):
+            raise TypeError("index_field must be a string")
+        if not isinstance(self.ylabel, str):
+            raise TypeError("ylabel must be a string")
+        if (self.y_formatter is not None and 
+            not callable(self.y_formatter)):
+            raise TypeError("y_formatter must be callable or None")
 
 # This function returns a function which
 # will get the value for a certain stage.
@@ -19,6 +58,46 @@ U = TypeVar('U')
 # data - the dataframe in question
 # value - the value to be inserted into the array ,
 # From the start value is an array with nan values
+
+def handle_generic_plot(init_values: dict, 
+                       name_group: DataFrameGroupBy, 
+                       plot_config: PlotConfig) -> dict:
+    """Handle generic plotting for different race metrics.
+
+    Args:
+        init_values: Dictionary containing plot initialization values.
+        name_group: Grouped DataFrame containing race data.
+        plot_config: PlotConfig instance with plotting configuration.
+
+    Returns:
+        dict: Updated initialization values dictionary.
+
+    Example:
+        >>> config = PlotConfig(index_field='time_delta', ylabel='Time')
+        >>> result = handle_generic_plot(init_vals, group_data, config)
+    """
+    name, data = name_group
+    unique_stages = init_values['unique']
+    ax = init_values['ax']
+    values = np.full(len(unique_stages), np.nan)
+
+    rider_vals = reduce(handle_stage_name, unique_stages, {
+        'data': data,
+        'times': values,
+        'index': plot_config.index_field
+    })
+
+    ax.plot(unique_stages, rider_vals['times'], 
+            plot_config.plot_style, label=name[0])
+    ax.set_xticks(unique_stages)
+    ax.set_xlabel('Stages')
+    ax.set_ylabel(plot_config.ylabel)
+    
+    if plot_config.y_formatter:
+        plot_config.y_formatter(ax)
+
+    init_values[name[0]] = rider_vals['times']
+    return init_values
 
 def make_plot_handler(converter: Callable[[U],T], df_filter: Callable)->Callable:
 
@@ -64,28 +143,25 @@ def filter_by(*, match_field: str, output_field: str ):
 
 
 def make_stage_plot_by_name2(df_orig: pd.DataFrame,
-                             unique_field: str,
-                             group_field: str,
-                             file_name: str,
-                             handler: callable):
-    """
-    Generate a stage plot by grouping a DataFrame and applying a handler function to each group.
+                            unique_field: str,
+                            group_field: str,
+                            file_name: str,
+                            handler: Callable,
+                            plot_config: PlotConfig) -> None:
+    """Generate a stage plot by grouping a DataFrame and applying a handler function.
 
-
-    Parameters:
-    df_orig (pd.DataFrame): The original DataFrame to be plotted.
-    unique_field (str): The field in the DataFrame to identify unique values.
-    group_field (str): The field in the DataFrame to group by.
-    file_name (str): The file name to save the generated plot.
-    handler (callable): A function to handle each group and plot it.
-
+    Args:
+        df_orig: The original DataFrame to be plotted.
+        unique_field: Field in the DataFrame to identify unique values.
+        group_field: Field in the DataFrame to group by.
+        file_name: File name to save the generated plot.
+        handler: Function to handle each group and plot it.
+        plot_config: PlotConfig instance with plotting configuration.
 
     Returns:
-    None
-
-    TODO: This should probably be split up into something else sometime in the future.
+        None
     """
-    fig, ax = plt.subplots(figsize=(20, 16))
+    fig, ax = plt.subplots(figsize=plot_config.figsize)
     df = df_orig.copy()
     sorted_unique = np.sort(df[unique_field].unique())
     group_by_field = df.groupby(group_field)
