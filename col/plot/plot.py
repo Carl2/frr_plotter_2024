@@ -45,7 +45,7 @@ class PlotConfig:
             raise TypeError("index_field must be a string")
         if not isinstance(self.ylabel, str):
             raise TypeError("ylabel must be a string")
-        if (self.y_formatter is not None and 
+        if (self.y_formatter is not None and
             not callable(self.y_formatter)):
             raise TypeError("y_formatter must be callable or None")
 
@@ -82,8 +82,8 @@ def handle_stage_name(init_values: dict, stage: int) -> dict:
         vals[int(stage)-1] = val
     return init_values
 
-def handle_generic_plot(init_values: dict, 
-                       name_group: DataFrameGroupBy, 
+def handle_generic_plot(init_values: dict,
+                       name_group: DataFrameGroupBy,
                        plot_config: PlotConfig) -> dict:
     """Handle generic plotting for different race metrics.
 
@@ -110,12 +110,12 @@ def handle_generic_plot(init_values: dict,
         'index': plot_config.index_field
     })
 
-    ax.plot(unique_stages, rider_vals['times'], 
+    ax.plot(unique_stages, rider_vals['times'],
             plot_config.plot_style, label=name[0])
     ax.set_xticks(unique_stages)
     ax.set_xlabel('Stages')
     ax.set_ylabel(plot_config.ylabel)
-    
+
     if plot_config.y_formatter:
         plot_config.y_formatter(ax)
 
@@ -189,6 +189,15 @@ def make_stage_plot_by_name2(df_orig: pd.DataFrame,
     sorted_unique = np.sort(df[unique_field].unique())
     group_by_field = df.groupby(group_field)
     reduce(handler, group_by_field, {'unique': sorted_unique, 'ax': ax})
-    ax.legend()
+    # plt.legend(fontsize=14)
+    # plt.legend(loc='best')ccb
+    # Single legend call with customization
+    ax.legend(bbox_to_anchor=(1.05, 1),
+             loc='upper right',
+             fontsize=12,
+             borderaxespad=0.)
+
+    #ax.legend()
+    plt.tight_layout()  # Adjust layout to prevent legend cutoff
     plt.savefig(file_name, bbox_inches='tight')
     plt.close()
