@@ -10,7 +10,7 @@ Winner	1 hrs, 1 m 33.765 s 253w @3.60WKG	972	178	400	(0)	(0)	1.550
 1.553 s	1 hrs, 4 m 217w @3.20WKG	940	184	376	(0)	(0)	1.500
 2	M-GHT	Henrik Tullborg [SZ]	SZ	50+
 1 m 20.340 s	47 m 12.907 s 277w @3.50WKG	728	869	752	(0)	(0)	2.349
-2	M-GHT	Thomas K.Rydeker [SZ]	SZ	Vet
+2	M-GHT	Thomas K.Rydeker [SZ](GHT)	SZ	Vet
 1 m 35.710 s	47 m 28.277 s 241w @3.50WKG	740	754	736	(0)	(0)	2.230
 2	M-GHT	Mattias Sjöberg [SZ] (GHT	SZ	Vet
 1 m 49.764 s	47 m 42.331 s 258w @3.60WKG	712	742	712	(0)	(0)	2.166
@@ -24,7 +24,7 @@ Winner	1 hrs, 1 m 33.765 s 253w @3.60WKG	972	178	400	(0)	(0)	1.550
 1 m 9.718 s	18 m 44.607 s 284w @4.00WKG	712	0	712	(0)	(0)	1.424
 1	M-GHT	Calle Olsen [SZ]	SZ	50+
 1 m 10.576 s	18 m 45.465 s 253w @4.00WKG	704	0	704	(0)	(0)	1.408
-1	M-GHT	Thomas K.Rydeker [SZ]	SZ	Vet
+1	M-GHT	Thomas K.Rydeker [SZ](GHT)	SZ	Vet
 1 m 22.033 s	18 m 56.922 s 266w @3.90WKG	668	0	668	(0)	(0)	1.336
 1	M-GHT	Henrik Tullborg [SZ]	SZ	50+
 1 m 24.127 s	18 m 59.016 s 307w @3.80WKG	668	0	668	(0)	(0)	1.336

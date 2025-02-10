@@ -11,6 +11,32 @@ from dataclasses import dataclass
 T = TypeVar('T')
 U = TypeVar('U')
 
+def handle_stage_name(init_values: dict, stage: int) -> dict:
+    """Handle data processing for a single stage.
+
+    Args:
+        init_values: Dictionary containing data and configuration
+        stage: Stage number to process
+
+    Returns:
+        dict: Updated initialization values
+    """
+    data = init_values['data']
+    vals = init_values['times']
+    index = init_values['index']
+    stage_value = data[data['stage'] == stage][index]
+
+    if len(stage_value) != 0:
+        if hasattr(stage_value, 'dt'):
+            val = stage_value.dt.total_seconds().iloc[0]
+        else:
+            val = stage_value.iloc[0]
+        vals[int(stage)-1] = val
+    return init_values
+
+
+
+
 @dataclass
 class PlotConfig:
     """Configuration for plot generation.
@@ -38,6 +64,7 @@ class PlotConfig:
     y_formatter: Optional[Callable[[plt.Axes], None]] = None
     plot_style: str = 'o-'
     figsize: tuple[int, int] = (20, 16)
+    stage_name_handler: Callable[[ dict, int], dict] = handle_stage_name
 
     def __post_init__(self) -> None:
         """Validate configuration after initialization."""
@@ -59,28 +86,7 @@ class PlotConfig:
 # value - the value to be inserted into the array ,
 # From the start value is an array with nan values
 
-def handle_stage_name(init_values: dict, stage: int) -> dict:
-    """Handle data processing for a single stage.
 
-    Args:
-        init_values: Dictionary containing data and configuration
-        stage: Stage number to process
-
-    Returns:
-        dict: Updated initialization values
-    """
-    data = init_values['data']
-    vals = init_values['times']
-    index = init_values['index']
-    stage_value = data[data['stage'] == stage][index]
-
-    if len(stage_value) != 0:
-        if hasattr(stage_value, 'dt'):
-            val = stage_value.dt.total_seconds().iloc[0]
-        else:
-            val = stage_value.iloc[0]
-        vals[int(stage)-1] = val
-    return init_values
 
 def handle_generic_plot(init_values: dict,
                        name_group: DataFrameGroupBy,
@@ -100,19 +106,20 @@ def handle_generic_plot(init_values: dict,
         >>> result = handle_generic_plot(init_vals, group_data, config)
     """
     name, data = name_group
-    print(f"Debug - name type: {type(name)}, name value: {name}")  # Debug print
+    #print(f"Debug - name type: {type(name)}, name value: {name}")  # Debug print
     unique_stages = init_values['unique']
     ax = init_values['ax']
     values = np.full(len(unique_stages), np.nan)
 
-    rider_vals = reduce(handle_stage_name, unique_stages, {
-        'data': data,
-        'times': values,
-        'index': plot_config.index_field
-    })
+    rider_vals = reduce(plot_config.stage_name_handler,
+                        unique_stages, {
+                            'data': data,
+                            'times': values,
+                            'index': plot_config.index_field
+                        })
 
     full_name = name[0] if isinstance(name, tuple) else name
-    print(f"Debug - full_name: {full_name}")  # Debug print
+    #ic(full_name)
     ax.plot(unique_stages, rider_vals['times'],
             plot_config.plot_style, label=full_name)
     ax.set_xticks(unique_stages)
@@ -124,6 +131,7 @@ def handle_generic_plot(init_values: dict,
 
     init_values[name[0]] = rider_vals['times']
     return init_values
+
 
 def make_plot_handler(converter: Callable[[U],T], df_filter: Callable)->Callable:
 
@@ -196,11 +204,12 @@ def make_stage_plot_by_name2(df_orig: pd.DataFrame,
     # plt.legend(loc='best')ccb
     # Single legend call with customization
     ax.legend(bbox_to_anchor=(1.05, 1),
-             loc='upper right',
+             loc='upper left',
              fontsize=12,
              borderaxespad=0.)
 
     #ax.legend()
     plt.tight_layout()  # Adjust layout to prevent legend cutoff
-    plt.savefig(file_name, bbox_inches='tight')
-    plt.close()
+    return fig,df
+    #plt.savefig(file_name, bbox_inches='tight')
+    #plt.close()
