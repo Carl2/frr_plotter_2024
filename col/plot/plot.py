@@ -63,7 +63,7 @@ class PlotConfig:
     ylabel: str
     y_formatter: Optional[Callable[[plt.Axes], None]] = None
     plot_style: str = 'o-'
-    figsize: tuple[int, int] = (20, 16)
+    figsize: tuple[int, int] = (24, 12)
     stage_name_handler: Callable[[ dict, int], dict] = handle_stage_name
 
     def __post_init__(self) -> None:
@@ -179,7 +179,7 @@ def filter_by(*, match_field: str, output_field: str ):
 def make_stage_plot_by_name2(df_orig: pd.DataFrame,
                             unique_field: str,
                             group_field: str,
-                            file_name: str,
+                            output_handler: Callable[[plt.Figure, pd.DataFrame],None],
                             handler: Callable,
                             plot_config: PlotConfig) -> None:
     """Generate a stage plot by grouping a DataFrame and applying a handler function.
@@ -195,7 +195,7 @@ def make_stage_plot_by_name2(df_orig: pd.DataFrame,
     Returns:
         None
     """
-    fig, ax = plt.subplots(figsize=plot_config.figsize)
+    fig, ax = plt.subplots(figsize=plot_config.figsize, dpi=110)
     df = df_orig.copy()
     sorted_unique = np.sort(df[unique_field].unique())
     group_by_field = df.groupby(group_field)
@@ -210,6 +210,7 @@ def make_stage_plot_by_name2(df_orig: pd.DataFrame,
 
     #ax.legend()
     plt.tight_layout()  # Adjust layout to prevent legend cutoff
+    output_handler(fig, df)
     return fig,df
     #plt.savefig(file_name, bbox_inches='tight')
     #plt.close()

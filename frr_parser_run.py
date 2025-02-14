@@ -9,7 +9,7 @@ from col.plot.plot import make_stage_plot_by_name2, PlotConfig, handle_generic_p
 from pdb import set_trace
 from icecream import ic
 import streamlit as st
-import mpld3
+#import mpld3
 
 def convert_to_time_repr(seconds: float):
     return str(timedelta(seconds=seconds))
@@ -74,7 +74,24 @@ def polka_sum_handler(init_values: dict, stage: int) -> dict:
 
     return init_values
 
+###############################################################################
+#                                Output handler                               #
+###############################################################################
 
+
+
+def fn_streamlit(header_text: str, tbl):
+
+    def streamlit(fig,df ):
+        st.header(header_text)
+        st.pyplot(fig)
+        st.dataframe(df[["name","stage",tbl]].sort_values(by="stage"))
+
+    return streamlit
+
+###############################################################################
+#                                   The rest                                  #
+###############################################################################
 
 def main():
     df = parse_file("tezt.txt")
@@ -100,27 +117,53 @@ def main():
     )
 
     polka_config = PlotConfig(
-        index_field='total',
+        index_field='polka',
         ylabel='Polka'
     )
 
     polka_config_sum = PlotConfig(
-        index_field='total',
+        index_field='polka',
         ylabel='Polka',
         stage_name_handler=polka_sum_handler
     )
 
+    sprint_config = PlotConfig(
+        index_field='sprint',
+        ylabel='Polka'
+    )
+
+    sprint_config_sum = PlotConfig(
+        index_field='sprint',
+        ylabel='Polka',
+        stage_name_handler=polka_sum_handler
+    )
+
+    total_config = PlotConfig(
+        index_field='total',
+        ylabel='Total',
+    )
+
+    total_config_sum = PlotConfig(
+        index_field='total',
+        ylabel='Total accumulated',
+        stage_name_handler=polka_sum_handler
+    )
+
+
+    ###########################################################################
+    #                              Createing data                             #
+    ###########################################################################
     # Create plots using the generic handler
     fig_egap,df_data=make_stage_plot_by_name2(
         df, 'stage', 'name',
-        "frr2_plot_rider_egap.svg",
+        fn_streamlit("Rider E-Gap Plot", "egap"),
         lambda x, y: handle_generic_plot(x, y, egap_config),
         egap_config
     )
 
     fig_egap_sum,_ =make_stage_plot_by_name2(
         df, 'stage', 'name',
-        "frr2_plot_rider_egap.svg",
+        fn_streamlit("Rider E-Gap accumulated ", "egap"),
         lambda x, y: handle_generic_plot(x, y, egap_config_sum),
         egap_config_sum
     )
@@ -128,41 +171,84 @@ def main():
 
     fig_times,_ = make_stage_plot_by_name2(
         df, 'stage', 'name',
-        "frr2_plot_rider_times.svg",
+        fn_streamlit("Rider times ", "time_delta"),
         lambda x, y: handle_generic_plot(x, y, times_config),
         times_config
     )
 
     fig_polka,_ = make_stage_plot_by_name2(
         df, 'stage', 'name',
-        "frr2_plot_rider_polka.svg",
+        fn_streamlit("Rider polka score ", "polka"),
         lambda x, y: handle_generic_plot(x, y, polka_config),
         polka_config)
 
     fig_polka_sum,_ = make_stage_plot_by_name2(
         df, 'stage', 'name',
-        "frr2_plot_rider_polka_sum.svg",
+        fn_streamlit("Rider polka score accum", "polka"),
         lambda x, y: handle_generic_plot(x, y, polka_config_sum),
         polka_config_sum)
 
-    st.header("Rider E-Gap Plot")
-    st.pyplot(fig_egap)
+    fig_sprint,_ = make_stage_plot_by_name2(
+        df, 'stage', 'name',
+        fn_streamlit("Rider sprint score", "sprint"),
+        lambda x, y: handle_generic_plot(x, y, sprint_config),
+        sprint_config)
 
-    st.header("Rider SUM E-Gap Plot")
-    st.pyplot(fig_egap_sum)
 
-    st.header("Rider Times Plot")
-    st.pyplot(fig_times)
+    fig_sprint_sum,_ = make_stage_plot_by_name2(
+        df, 'stage', 'name',
+        fn_streamlit("Rider sprint score accumulated", "sprint"),
+        lambda x, y: handle_generic_plot(x, y, sprint_config_sum),
+        sprint_config_sum)
 
-    st.header("Rider Polka Plot")
-    st.pyplot(fig_polka)
+    # fig_total,_ = make_stage_plot_by_name2(
+    #     df, 'stage', 'name',
+    #     "frr2_plot_rider_total.svg",
+    #     lambda x, y: handle_generic_plot(x, y, total_config),
+    #     total_config)
 
-    st.header("Rider Polka Plot")
-    st.pyplot(fig_polka_sum)
+    # fig_total_sum,_ = make_stage_plot_by_name2(
+    #     df, 'stage', 'name',
+    #     "frr2_plot_rider_total.svg",
+    #     lambda x, y: handle_generic_plot(x, y, total_config_sum),
+    #     total_config_sum)
+
+
+    ###########################################################################
+    #                                Printouts                                #
+    ###########################################################################
+    #fn_streamlit("Rider E-Gap Plot", "egap")(fig_egap, df)
+    # st.header("Rider E-Gap Plot")
+    # st.pyplot(fig_egap)
+
+    # st.header("Rider SUM E-Gap Plot")
+    # st.pyplot(fig_egap_sum)
+
+    # st.header("Rider Times Plot")
+    # st.pyplot(fig_times)
+
+    # st.header("Rider Polka Plot")
+    # st.pyplot(fig_polka)
+
+    # st.header("Rider Polka Plot accumulated")
+    # st.pyplot(fig_polka_sum)
+
+    # st.header("Rider sprint Plot")
+    # st.pyplot(fig_sprint)
+
+    # st.header("Rider sprint Plot accumulated")
+    # st.pyplot(fig_sprint_sum)
+
+    # st.header("Total pts / stage")
+    # st.pyplot(fig_total)
+
+    # st.header("Total pts accumulated")
+    # st.pyplot(fig_total_sum)
 
     st.header("Data Table")
     st.dataframe(df_data)
 
+#    plt.savefig(, bbox_inches='tight')
 
 
 if __name__ == '__main__':
