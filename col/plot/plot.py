@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
+from col.plot.plotter_fns import get_mpl_output
 from pandas.core.groupby.generic import DataFrameGroupBy
 from functools import reduce
 import pandas as pd
@@ -88,49 +89,57 @@ class PlotConfig:
 
 
 
-def handle_generic_plot(init_values: dict,
-                       name_group: DataFrameGroupBy,
-                       plot_config: PlotConfig) -> dict:
-    """Handle generic plotting for different race metrics.
 
-    Args:
-        init_values: Dictionary containing plot initialization values.
-        name_group: Grouped DataFrame containing race data.
-        plot_config: PlotConfig instance with plotting configuration.
+def handle_generic_plot(plotter_fn: Callable, plot_config: PlotConfig) -> Callable:
 
-    Returns:
-        dict: Updated initialization values dictionary.
 
-    Example:
-        >>> config = PlotConfig(index_field='time_delta', ylabel='Time')
-        >>> result = handle_generic_plot(init_vals, group_data, config)
-    """
-    name, data = name_group
-    #print(f"Debug - name type: {type(name)}, name value: {name}")  # Debug print
-    unique_stages = init_values['unique']
-    ax = init_values['ax']
-    values = np.full(len(unique_stages), np.nan)
+    def exec_fn(init_values: dict,
+                name_group: DataFrameGroupBy) -> dict:
+        """Handle generic plotting for different race metrics.
 
-    rider_vals = reduce(plot_config.stage_name_handler,
-                        unique_stages, {
-                            'data': data,
-                            'times': values,
-                            'index': plot_config.index_field
-                        })
+        Args:
+            init_values: Dictionary containing plot initialization values.
+            name_group: Grouped DataFrame containing race data.
+            plot_config: PlotConfig instance with plotting configuration.
 
-    full_name = name[0] if isinstance(name, tuple) else name
-    #ic(full_name)
-    ax.plot(unique_stages, rider_vals['times'],
-            plot_config.plot_style, label=full_name)
-    ax.set_xticks(unique_stages)
-    ax.set_xlabel('Stages')
-    ax.set_ylabel(plot_config.ylabel)
+        Returns:
+            dict: Updated initialization values dictionary.
 
-    if plot_config.y_formatter:
-        plot_config.y_formatter(ax)
+        Example:
+            >>> config = PlotConfig(index_field='time_delta', ylabel='Time')
+            >>> result = handle_generic_plot(init_vals, group_data, config)
+        """
+        name, data = name_group
+        #print(f"Debug - name type: {type(name)}, name value: {name}")  # Debug print
+        unique_stages = init_values['unique']
+        ax = init_values['ax']
+        values = np.full(len(unique_stages), np.nan)
 
-    init_values[name[0]] = rider_vals['times']
-    return init_values
+        rider_vals = reduce(plot_config.stage_name_handler,
+                            unique_stages, {
+                                'data': data,
+                                'times': values,
+                                'index': plot_config.index_field
+                            })
+
+        full_name = name[0] if isinstance(name, tuple) else name
+        plotter_fn(unique_stages,
+                   rider_vals['times'],
+                   full_name,
+                   plot_config)
+        #ic(full_name)
+        # ax.plot(unique_stages, rider_vals['times'],
+        #         plot_config.plot_style, label=full_name)
+        # ax.set_xticks(unique_stages)
+        # ax.set_xlabel('Stages')
+        # ax.set_ylabel(plot_config.ylabel)
+
+        # if plot_config.y_formatter:
+        #     plot_config.y_formatter(ax)
+
+        init_values[name[0]] = rider_vals['times']
+        return init_values
+    return exec_fn
 
 
 def make_plot_handler(converter: Callable[[U],T], df_filter: Callable)->Callable:
@@ -199,7 +208,11 @@ def make_stage_plot_by_name2(df_orig: pd.DataFrame,
     df = df_orig.copy()
     sorted_unique = np.sort(df[unique_field].unique())
     group_by_field = df.groupby(group_field)
-    reduce(handler, group_by_field, {'unique': sorted_unique, 'ax': ax})
+
+    plotter_fn = get_mpl_output(ax)
+    new_handler = handle_generic_plot(plotter_fn, plot_config)
+
+    reduce(new_handler, group_by_field, {'unique': sorted_unique, 'ax': ax})
     # plt.legend(fontsize=14)
     # plt.legend(loc='best')ccb
     # Single legend call with customization
