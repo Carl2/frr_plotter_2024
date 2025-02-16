@@ -127,15 +127,7 @@ def handle_generic_plot(plotter_fn: Callable, plot_config: PlotConfig) -> Callab
                    rider_vals['times'],
                    full_name,
                    plot_config)
-        #ic(full_name)
-        # ax.plot(unique_stages, rider_vals['times'],
-        #         plot_config.plot_style, label=full_name)
-        # ax.set_xticks(unique_stages)
-        # ax.set_xlabel('Stages')
-        # ax.set_ylabel(plot_config.ylabel)
 
-        # if plot_config.y_formatter:
-        #     plot_config.y_formatter(ax)
 
         init_values[name[0]] = rider_vals['times']
         return init_values
