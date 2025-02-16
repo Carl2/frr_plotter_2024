@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import matplotlib.pyplot as plt
 from pandas.core.groupby.generic import DataFrameGroupBy
 import pandas as pd
 from functools import reduce
@@ -6,10 +7,27 @@ from datetime import timedelta
 import numpy as np
 from col.common.frr_copy_parser import parse_file
 from col.plot.plot import make_stage_plot_by_name2, PlotConfig, handle_generic_plot
+from col.plot.plotter_fns import get_mpl_output
 from pdb import set_trace
 from icecream import ic
 import streamlit as st
 #import mpld3
+
+def generate_matplot_handler(plot_config: PlotConfig) -> callable:
+    fig, ax = plt.subplots(figsize=plot_config.figsize, dpi=110)
+
+    ax.legend(bbox_to_anchor=(1.05, 1),
+              loc='upper left',
+              fontsize=12,
+              borderaxespad=0.)
+
+    #ax.legend()
+    plt.tight_layout()  # Adjust layout to prevent legend cutoff
+    plotter_fn = get_mpl_output(ax)
+    new_handler = handle_generic_plot(plotter_fn, plot_config)
+    return fig,new_handler
+
+
 
 def convert_to_time_repr(seconds: float):
     return str(timedelta(seconds=seconds))
@@ -80,9 +98,9 @@ def polka_sum_handler(init_values: dict, stage: int) -> dict:
 
 
 
-def fn_streamlit(header_text: str, tbl):
+def fn_streamlit(fig, header_text: str, tbl):
 
-    def streamlit(fig,df ):
+    def streamlit(df):
         st.header(header_text)
         st.pyplot(fig)
         st.dataframe(df[["name","stage",tbl]].sort_values(by="stage"))
@@ -148,60 +166,71 @@ def main():
         ylabel='Total accumulated',
         stage_name_handler=polka_sum_handler
     )
-
+    ###########################################################################
+    #                                Make plot                                #
+    ###########################################################################
+    # fig, ax = plt.subplots(figsize=plot_config.figsize, dpi=110)
+    # plotter_fn = get_mpl_output(ax)
+    # new_handler = new_handler(plotter_fn, plot_config)
 
     ###########################################################################
     #                              Createing data                             #
     ###########################################################################
     # Create plots using the generic handler
-    fig_egap,df_data=make_stage_plot_by_name2(
+    fig,handler = generate_matplot_handler(egap_config)
+    df_data=make_stage_plot_by_name2(
         df, 'stage', 'name',
-        fn_streamlit("Rider E-Gap Plot", "egap"),
-        lambda x, y: handle_generic_plot(x, y, egap_config),
+        fn_streamlit(fig,"Rider E-Gap Plot", "egap"),
+        lambda x, y: handler(x, y),
         egap_config
     )
 
-    fig_egap_sum,_ =make_stage_plot_by_name2(
+    fig,handler = generate_matplot_handler(egap_config_sum)
+    _ =make_stage_plot_by_name2(
         df, 'stage', 'name',
-        fn_streamlit("Rider E-Gap accumulated ", "egap"),
-        lambda x, y: handle_generic_plot(x, y, egap_config_sum),
+        fn_streamlit(fig, "Rider E-Gap accumulated ", "egap"),
+        lambda x, y: handler(x, y),
         egap_config_sum
     )
 
-
-    fig_times,_ = make_stage_plot_by_name2(
+    fig,handler = generate_matplot_handler(times_config)
+    _ = make_stage_plot_by_name2(
         df, 'stage', 'name',
-        fn_streamlit("Rider times ", "time_delta"),
-        lambda x, y: handle_generic_plot(x, y, times_config),
+        fn_streamlit(fig, "Rider times ", "time_delta"),
+        lambda x, y: handler(x, y),
         times_config
     )
 
-    fig_polka,_ = make_stage_plot_by_name2(
+    fig,handler = generate_matplot_handler(polka_config)
+    _ = make_stage_plot_by_name2(
         df, 'stage', 'name',
-        fn_streamlit("Rider polka score ", "polka"),
-        lambda x, y: handle_generic_plot(x, y, polka_config),
+        fn_streamlit(fig, "Rider polka score ", "polka"),
+        lambda x, y: handler(x, y),
         polka_config)
 
-    fig_polka_sum,_ = make_stage_plot_by_name2(
+    fig,handler = generate_matplot_handler(polka_config_sum)
+    _ = make_stage_plot_by_name2(
         df, 'stage', 'name',
-        fn_streamlit("Rider polka score accum", "polka"),
-        lambda x, y: handle_generic_plot(x, y, polka_config_sum),
+        fn_streamlit(fig, "Rider polka score accum", "polka"),
+        lambda x, y: handler(x, y),
         polka_config_sum)
 
-    fig_sprint,_ = make_stage_plot_by_name2(
+    fig,handler = generate_matplot_handler(sprint_config)
+    _ = make_stage_plot_by_name2(
         df, 'stage', 'name',
-        fn_streamlit("Rider sprint score", "sprint"),
-        lambda x, y: handle_generic_plot(x, y, sprint_config),
+        fn_streamlit(fig, "Rider sprint score", "sprint"),
+        lambda x, y: handler(x, y),
         sprint_config)
 
-
-    fig_sprint_sum,_ = make_stage_plot_by_name2(
+    fig,handler = generate_matplot_handler(sprint_config_sum)
+    _ = make_stage_plot_by_name2(
         df, 'stage', 'name',
-        fn_streamlit("Rider sprint score accumulated", "sprint"),
-        lambda x, y: handle_generic_plot(x, y, sprint_config_sum),
+        fn_streamlit(fig, "Rider sprint score accumulated", "sprint"),
+        lambda x, y: handler(x, y),
         sprint_config_sum)
 
-    # fig_total,_ = make_stage_plot_by_name2(
+    # fig,handler = generate_matplot_handler(sprint_config_sum)
+    # _ = make_stage_plot_by_name2(
     #     df, 'stage', 'name',
     #     "frr2_plot_rider_total.svg",
     #     lambda x, y: handle_generic_plot(x, y, total_config),

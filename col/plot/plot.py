@@ -112,7 +112,7 @@ def handle_generic_plot(plotter_fn: Callable, plot_config: PlotConfig) -> Callab
         name, data = name_group
         #print(f"Debug - name type: {type(name)}, name value: {name}")  # Debug print
         unique_stages = init_values['unique']
-        ax = init_values['ax']
+        #ax = init_values['ax']
         values = np.full(len(unique_stages), np.nan)
 
         rider_vals = reduce(plot_config.stage_name_handler,
@@ -196,26 +196,12 @@ def make_stage_plot_by_name2(df_orig: pd.DataFrame,
     Returns:
         None
     """
-    fig, ax = plt.subplots(figsize=plot_config.figsize, dpi=110)
+
     df = df_orig.copy()
     sorted_unique = np.sort(df[unique_field].unique())
     group_by_field = df.groupby(group_field)
-
-    plotter_fn = get_mpl_output(ax)
-    new_handler = handle_generic_plot(plotter_fn, plot_config)
-
-    reduce(new_handler, group_by_field, {'unique': sorted_unique, 'ax': ax})
-    # plt.legend(fontsize=14)
-    # plt.legend(loc='best')ccb
-    # Single legend call with customization
-    ax.legend(bbox_to_anchor=(1.05, 1),
-             loc='upper left',
-             fontsize=12,
-             borderaxespad=0.)
-
-    #ax.legend()
-    plt.tight_layout()  # Adjust layout to prevent legend cutoff
-    output_handler(fig, df)
-    return fig,df
+    reduce(handler, group_by_field, {'unique': sorted_unique})
+    output_handler(df)
+    return df
     #plt.savefig(file_name, bbox_inches='tight')
     #plt.close()
