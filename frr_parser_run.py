@@ -6,7 +6,7 @@ import pandas as pd
 from functools import reduce
 from datetime import timedelta
 import numpy as np
-from col.common.frr_copy_parser import parse_file
+from col.common.frr_copy_parser import parse_file,parse_lines,make_performance_dataframe
 from col.plot.plot import make_stage_plot_by_name2, PlotConfig, handle_generic_plot
 from col.plot.plotter_fns import get_mpl_output
 from pdb import set_trace
@@ -34,12 +34,7 @@ def generate_matplot_handler(plot_config: PlotConfig) -> callable:
                                        creating generic plots with the specified configuration.
     """
     fig, ax = plt.subplots(figsize=plot_config.figsize, dpi=110)
-
-    ax.legend(bbox_to_anchor=(1.05, 1),
-              loc='upper left',
-              fontsize=12,
-              borderaxespad=0.)
-
+    #ax.legend()
     plt.tight_layout()  # Adjust layout to prevent legend cutoff
     plotter_fn = get_mpl_output(ax) # This creates a matplot lib function
     new_handler = handle_generic_plot(plotter_fn, plot_config)
@@ -132,26 +127,58 @@ def fn_streamlit(fig: plt.Figure, header_text: str, tbl):
 #                                   The rest                                  #
 ###############################################################################
 
+def form_data():
+    if 'frr_data' not in st.session_state:
+        st.session_state.frr_data = ''
+
+    # Use form to group input and submission
+    with st.form("frr_form"):
+        text_input = st.text_area(
+            "FRR Data",
+            value=st.session_state.frr_data,
+            height=300,
+            key="frr_input"
+        )
+        submitted = st.form_submit_button("Process Data")
+
+        if submitted:
+            if not text_input.strip():
+                st.error("Please paste FRR data in the text box above")
+            else:
+                st.session_state.frr_data = text_input  # Persist data
+                lines = text_input.strip().splitlines()
+                lst = parse_lines(lines)
+                df = make_performance_dataframe(lst)
+                ic(df)
+                return(df)
+                # Proceed with data processing
+                #process_data(text_input)  # Your processing function
+
+
+
 def main():
     st.title("FRR Parser")
     st.write("Paste FRR data below (same format as tezt.txt):")
-    
+    # TODO: THis not complete.
+    df = form_data()
+
     # Add text area for input
-    text_input = st.text_area("FRR Data", height=300)
-    
-    # Check if we have input
-    if not text_input:
-        st.error("Please paste FRR data in the text box above")
-        return
-        
+    # text_input = st.text_area("FRR Data", height=300)
+
+    # # Check if we have input
+    # if not text_input:
+    #     st.error("Please paste FRR data in the text box above")
+    #     return
+
+    # if st.button("Generate Plots"):
+    #     df = parse_file("tezt.txt")  # Commented out original file reading line
+    #     #df = parse_file(text_stream)
+
     # Convert text input to a temporary file-like object
-    from io import StringIO
-    text_stream = StringIO(text_input)
+    # from io import StringIO
+    # text_stream = StringIO(text_input)
 
-    if st.button("Generate Plots"):
-        # df = parse_file("tezt.txt")  # Commented out original file reading line
-        df = parse_file(text_stream)
-
+    #df = parse_file("tezt.txt")  # Commented out original file reading line
     # Configure different plot types using PlotConfig
     egap_config = PlotConfig(
         index_field='egap_td',
@@ -262,55 +289,10 @@ def main():
         lambda x, y: handler(x, y),
         sprint_config_sum)
 
-    # fig,handler = generate_matplot_handler(sprint_config_sum)
-    # _ = make_stage_plot_by_name2(
-    #     df, 'stage', 'name',
-    #     "frr2_plot_rider_total.svg",
-    #     lambda x, y: handle_generic_plot(x, y, total_config),
-    #     total_config)
-
-    # fig_total_sum,_ = make_stage_plot_by_name2(
-    #     df, 'stage', 'name',
-    #     "frr2_plot_rider_total.svg",
-    #     lambda x, y: handle_generic_plot(x, y, total_config_sum),
-    #     total_config_sum)
-
-
-    ###########################################################################
-    #                                Printouts                                #
-    ###########################################################################
-    #fn_streamlit("Rider E-Gap Plot", "egap")(fig_egap, df)
-    # st.header("Rider E-Gap Plot")
-    # st.pyplot(fig_egap)
-
-    # st.header("Rider SUM E-Gap Plot")
-    # st.pyplot(fig_egap_sum)
-
-    # st.header("Rider Times Plot")
-    # st.pyplot(fig_times)
-
-    # st.header("Rider Polka Plot")
-    # st.pyplot(fig_polka)
-
-    # st.header("Rider Polka Plot accumulated")
-    # st.pyplot(fig_polka_sum)
-
-    # st.header("Rider sprint Plot")
-    # st.pyplot(fig_sprint)
-
-    # st.header("Rider sprint Plot accumulated")
-    # st.pyplot(fig_sprint_sum)
-
-    # st.header("Total pts / stage")
-    # st.pyplot(fig_total)
-
-    # st.header("Total pts accumulated")
-    # st.pyplot(fig_total_sum)
 
     st.header("Data Table")
     st.dataframe(df_data)
 
-#    plt.savefig(, bbox_inches='tight')
 
 
 if __name__ == '__main__':

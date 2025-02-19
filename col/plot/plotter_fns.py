@@ -12,6 +12,10 @@ def get_mpl_output(ax: plt.Axes) -> callable:
         ax.set_xticks(x_values)
         ax.set_xlabel('Stages')
         ax.set_ylabel(config.ylabel)
+        ax.legend(bbox_to_anchor=(1.05, 1),
+                  loc='upper left',
+                  fontsize=12,
+                  borderaxespad=0.)
         if config.y_formatter:
             config.y_formatter(ax)
     return output_fn
