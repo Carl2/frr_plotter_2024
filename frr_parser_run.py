@@ -149,6 +149,7 @@ def main():
     text_stream = StringIO(text_input)
 
     if st.button("Generate Plots"):
+        # df = parse_file("tezt.txt")  # Commented out original file reading line
         df = parse_file(text_stream)
 
     # Configure different plot types using PlotConfig
