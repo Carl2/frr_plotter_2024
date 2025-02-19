@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from io import StringIO
 import matplotlib.pyplot as plt
 from pandas.core.groupby.generic import DataFrameGroupBy
 import pandas as pd
@@ -132,7 +133,23 @@ def fn_streamlit(fig: plt.Figure, header_text: str, tbl):
 ###############################################################################
 
 def main():
-    df = parse_file("tezt.txt")
+    st.title("FRR Parser")
+    st.write("Paste FRR data below (same format as tezt.txt):")
+    
+    # Add text area for input
+    text_input = st.text_area("FRR Data", height=300)
+    
+    # Check if we have input
+    if not text_input:
+        st.error("Please paste FRR data in the text box above")
+        return
+        
+    # Convert text input to a temporary file-like object
+    from io import StringIO
+    text_stream = StringIO(text_input)
+
+    if st.button("Generate Plots"):
+        df = parse_file(text_stream)
 
     # Configure different plot types using PlotConfig
     egap_config = PlotConfig(
