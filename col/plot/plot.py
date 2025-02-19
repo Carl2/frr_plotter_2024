@@ -100,7 +100,6 @@ def handle_generic_plot(plotter_fn: Callable, plot_config: PlotConfig) -> Callab
         Args:
             init_values: Dictionary containing plot initialization values.
             name_group: Grouped DataFrame containing race data.
-            plot_config: PlotConfig instance with plotting configuration.
 
         Returns:
             dict: Updated initialization values dictionary.
@@ -156,25 +155,6 @@ def filter_by(*, match_field: str, output_field: str ):
     return filter_fn
 
 
-# def make_stage_plot_by_name(df_orig: pd.DataFrame,
-#                             file_name: str,
-#                             handler: callable):
-#     """Generates a stage plot for each rider based on their times in different stages.
-
-#     Args:
-#         df_orig (pd.DataFrame): The original dataframe containing rider data.
-#         file_name (str): The name of the file where the plot will be saved.
-#         handler (callable): A function to handle the grouping and plotting for each rider.
-
-#     """
-#     fig, ax = plt.subplots(figsize=(20, 16))
-#     df = df_orig.copy()
-#     unique_stages = df['Stage'].unique()
-#     group_by_field = df.groupby(['Name'])
-#     reduce(handler, group_by_field, {'stages': unique_stages, 'ax': ax})
-#     ax.legend()
-#     plt.savefig(file_name, bbox_inches='tight')
-#     plt.close()
 
 
 def make_stage_plot_by_name2(df_orig: pd.DataFrame,

@@ -11,9 +11,27 @@ from col.plot.plotter_fns import get_mpl_output
 from pdb import set_trace
 from icecream import ic
 import streamlit as st
-#import mpld3
 
+
+
+
+###############################################################################
+#                           Create a matplot figure                           #
+###############################################################################
 def generate_matplot_handler(plot_config: PlotConfig) -> callable:
+    """
+    Generates a Matplotlib figure and axis for plotting with the specified plot configuration.
+
+    Args:
+        plot_config (PlotConfig): Configuration object containing properties for the plot,
+                                   including figure size and other plot settings.
+
+    Returns:
+        tuple: A tuple containing:
+            - fig (matplotlib.figure.Figure): The created figure object.
+            - new_handler (callable): A handler function for the plot that can be used for
+                                       creating generic plots with the specified configuration.
+    """
     fig, ax = plt.subplots(figsize=plot_config.figsize, dpi=110)
 
     ax.legend(bbox_to_anchor=(1.05, 1),
@@ -21,12 +39,10 @@ def generate_matplot_handler(plot_config: PlotConfig) -> callable:
               fontsize=12,
               borderaxespad=0.)
 
-    #ax.legend()
     plt.tight_layout()  # Adjust layout to prevent legend cutoff
-    plotter_fn = get_mpl_output(ax)
+    plotter_fn = get_mpl_output(ax) # This creates a matplot lib function
     new_handler = handle_generic_plot(plotter_fn, plot_config)
-    return fig,new_handler
-
+    return fig, new_handler
 
 
 def convert_to_time_repr(seconds: float):
@@ -98,12 +114,16 @@ def polka_sum_handler(init_values: dict, stage: int) -> dict:
 
 
 
-def fn_streamlit(fig, header_text: str, tbl):
+def fn_streamlit(fig: plt.Figure, header_text: str, tbl):
 
     def streamlit(df):
         st.header(header_text)
         st.pyplot(fig)
+        # plt.plot(fig)
+        # fig_html = mpld3.fig_to_html(fig)
+        # components.html(fig_html, height=600)
         st.dataframe(df[["name","stage",tbl]].sort_values(by="stage"))
+
 
     return streamlit
 
@@ -166,12 +186,7 @@ def main():
         ylabel='Total accumulated',
         stage_name_handler=polka_sum_handler
     )
-    ###########################################################################
-    #                                Make plot                                #
-    ###########################################################################
-    # fig, ax = plt.subplots(figsize=plot_config.figsize, dpi=110)
-    # plotter_fn = get_mpl_output(ax)
-    # new_handler = new_handler(plotter_fn, plot_config)
+
 
     ###########################################################################
     #                              Createing data                             #
