@@ -1,0 +1,49 @@
+* Some changes
+
+Due to the changes into the frr standard there are change need to be done.
+
+
+** First
+The first line seems to be complete  as in:
+#+begin_example
+1	M-GHT	Calle Olsen [SZ]        SZ	50+
+#+end_example
+
+The problem is that instead of a tab =\t= sign there are places where
+its replaced with 8 spaces.
+It should be fairly straight forward.
+
+#+begin_example
+fn = split_by_fn('\t')
+out = fn(line)
+if out is no split
+  fn_space = split_by_fn('        ')
+  out = fn_space(line)
+
+ return out
+#+end_example
+
+
+Now this could be made into a more abstract function.
+
+Think of it as a function that takes a list of delimiters
+
+#+begin_example
+make_split_fn('\t','        ',',,,,,,,')
+#+end_example
+
+So what does it need to do.
+
+  1) make_split_fns
+     - Create a list of split fn
+
+#+begin_example
+split_fn::Callable[[str], Maybe]
+
+try_tree_split:: string -> List[split_fn] -> List[string]
+   if split_fn is END
+      return string
+   else
+      split_str = try_tree_split (split_fn string)
+      (string (next split_fn))
+#+end_example

@@ -23,6 +23,23 @@ def split_on_fn(delimiter: str) -> Callable[[str], Maybe]:
 
     return split_on
 
+def split_on_fn_multi(args: list[str] ):
+    list_of_fn = [ split_on_fn(delim) for delim in args ]
+    return list_of_fn
+
+def try_split(line: str, fn_iter: list[Callable[[str], Maybe]]) -> Maybe:
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def parse_time_str(time_str):
@@ -142,15 +159,16 @@ def make_performance_dataframe(list_fields: list[list[str]]):
     Returns:
         pd.DataFrame: A DataFrame with parsed performance data including additional calculated columns.
     """
-    header = ['stage', 'class', 'name', 'club', 'exp', 'egap', 'effort', 'polka', 'sprint', 'finish', 'vbw', 'upg', 'total']
+    header = ['stage', 'class', 'name', 'club', 'exp', 'egap', 'effort', 'P-S-F', 'vbw-upg', 'total']
     df = pd.DataFrame(data=list_fields, columns=header)
-    new_columns = df['effort'].apply(parse_effort).apply(pd.Series)
-    new_columns.columns = ['watts', 'wkg', 'time_delta']
-    df = pd.concat([df, new_columns], axis=1)
-    df['egap_td'] = df['egap'].apply(parse_egap)
-    df['polka'] = df['polka'].apply(parse_score)
-    df['sprint'] = df['sprint'].apply(parse_score)
-    df['total'] = df['total'].apply(parse_score)
+    #ic(df)
+    # new_columns = df['effort'].apply(parse_effort).apply(pd.Series)
+    # new_columns.columns = ['watts', 'wkg', 'time_delta']
+    # df = pd.concat([df, new_columns], axis=1)
+    # df['egap_td'] = df['egap'].apply(parse_egap)
+    # df['polka'] = df['polka'].apply(parse_score)
+    # df['sprint'] = df['sprint'].apply(parse_score)
+    # df['total'] = df['total'].apply(parse_score)
 
     return df
 
@@ -175,7 +193,8 @@ def parse_file(file_name: str) -> pd.DataFrame:
         lines = list(map(str.strip, file))
 
     lst = parse_lines(lines)
-    df = make_performance_dataframe(lst)
+    ic(lst)
+    #df = make_performance_dataframe(lst)
     return df
 
 

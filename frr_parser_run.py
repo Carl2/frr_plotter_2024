@@ -160,7 +160,7 @@ def main():
     st.title("FRR Parser")
     st.write("Paste FRR data below (same format as tezt.txt):")
     # TODO: THis not complete.
-    df = form_data()
+    #df = form_data()
 
     # Add text area for input
     # text_input = st.text_area("FRR Data", height=300)
@@ -171,7 +171,9 @@ def main():
     #     return
 
     # if st.button("Generate Plots"):
-    #     df = parse_file("tezt.txt")  # Commented out original file reading line
+    df = parse_file("tezt_2025_wt.txt")  # Commented out original file reading line
+    ic(df)
+    return
     #     #df = parse_file(text_stream)
 
     # Convert text input to a temporary file-like object
