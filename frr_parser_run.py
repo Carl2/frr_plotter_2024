@@ -157,8 +157,8 @@ def form_data():
 
 
 def main():
-    st.title("FRR Parser")
-    st.write("Paste FRR data below (same format as tezt.txt):")
+    #st.title("FRR Parser")
+    #st.write("Paste FRR data below (same format as tezt.txt):")
     # TODO: THis not complete.
     #df = form_data()
 

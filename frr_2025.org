@@ -47,3 +47,80 @@ try_tree_split:: string -> List[split_fn] -> List[string]
       split_str = try_tree_split (split_fn string)
       (string (next split_fn))
 #+end_example
+
+Come on!
+First we have
+[A B C "D-E"]
+
+Use two delimiters ['\t',"-"] → [fnT,FnM]
+Run the fnT(list) ⇢ [A,B,C,"D-E"]
+
+Next we run each item in the list through fnM
+$fn(list, fn) \Rightarrow fn(list+1,fn)$
+
+
+Lets try this
+
+#+NAME: split_on
+#+HEADER: :results output raw :exports both  :session split :wrap example
+#+begin_src python
+  from functools import reduce
+  from itertools import islice
+
+  def split_on_fn(delimiter):
+    def fun(line):
+      return line.split(delimiter)
+    return fun
+
+
+  def split_on_fn_multi(args: list[str] ):
+    list_of_fn = [ split_on_fn(delim) for delim in args ]
+    return list_of_fn
+
+
+
+
+
+
+
+
+  def run_list(string, fns, result):
+    fn = next(fns, None)
+    print(0, string)
+    if fn is not None:
+      print(1)
+      out = fn(string)
+      result.append(out)
+      for str_var in out:
+        run_list(str_var,islice(fns, 1, None), result)
+
+      print(result)
+      return out
+    else:
+      print("End")
+      return result
+
+
+
+
+
+
+  list_fns = split_on_fn_multi([' ','-'])
+  run_list("a b c d-e", iter(list_fns), [])
+
+#+end_src
+
+#+RESULTS: split_on
+#+begin_example
+0 a b c d-e
+1
+0 a
+End
+0 b
+End
+0 c
+End
+0 d-e
+End
+[['a', 'b', 'c', 'd-e']]
+#+end_example
