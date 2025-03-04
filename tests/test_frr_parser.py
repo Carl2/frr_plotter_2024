@@ -9,6 +9,7 @@ from pdb import set_trace
 from icecream import ic
 from col.common.split_by import split_by
 
+from col.common.frr_copy_parser import parse_lines
 # import pytest
 # import sys  # For modifying sys.path temporarily if necessary
 # import src.game_engine.data.messages as msg
@@ -17,8 +18,9 @@ from col.common.split_by import split_by
 # from src.common import Communication as com
 #
 from col.common.monadic import Maybe
-from col.common.frr_copy_parser import (split_on_fn, parse_effort,
-                                        parse_egap,convert_str_array_to_int)
+from col.common.frr_copy_parser import ( parse_effort,
+                                         parse_egap, convert_str_array_to_int)
+from col.common.utils import split_on_fn
 
 def convert_to_val(val: str) -> int:
     if val is not None and len(val) > 0:
@@ -104,12 +106,6 @@ class TestFrrParser(unittest.TestCase):
         self.assertFalse(result.is_ok)
         self.assertTrue("Failed to convert empty array" in result.val)
 
-
-
-
-
-
-
     def test_parse_effort(self ):
 
         string = "1 hrs, 1 m 13.338 s 223w @3.60WKG"
@@ -153,3 +149,16 @@ class TestFrrParser(unittest.TestCase):
 
         for egap_str, expected in test_cases:
             self.assertEqual(parse_egap(egap_str), expected)
+
+    #Well this wasn't so easy to test. But it should work
+    def test_parse_line_no_space(self):
+        line = """\
+1	M-GHT	Mathias de Paulis Nilsson	SZ"""
+        lst = parse_lines([line])
+        self.assertEqual(lst, [['1', 'M-GHT', 'Mathias de Paulis Nilsson', 'SZ','']] )
+
+    def test_parse_lines_with_space(self):
+        line = """\
+1	M-GHT	Calle Olsen [SZ]        SZ	50+"""
+        lst = parse_lines([line])
+        self.assertEqual(lst, [['1', 'M-GHT', 'Calle Olsen [SZ]', 'SZ', '50+', '']] )

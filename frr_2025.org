@@ -124,3 +124,19 @@ End
 End
 [['a', 'b', 'c', 'd-e']]
 #+end_example
+
+** Another problem
+
+Well the next problem is somewhat problematic.
+The =Exp= field is either
+ - empty
+ - Mas
+ - 50+
+ - 60+
+ - 70+
+The problem occurs when its empty. Then everything gets shrunk.
+The eassiest way is to add if its missing on the first line.
+
+This can be done in [[file:col/common/frr_copy_parser.py::def merge_lines(init: dict, line)->dict:][merge_lines]]
+in the =else= clause. If the number of fields are 4 then we need to add a field, but we havent split it?
+Shit! Need to rethink!...

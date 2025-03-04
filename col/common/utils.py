@@ -43,8 +43,8 @@ def split_on_fn(delimiter: str) -> Callable[[str], Maybe]:
     return split_on
 
 
-def exec_string_fn(line: str, fn: Callable[[str], Any])->Any:
-    return fn(line)
+def create_splitters(delims: list[str]) -> list[Callable[[str], Maybe]]:
+    return [split_on_fn(delim) for delim in delims]
 
 
 
@@ -88,3 +88,25 @@ def apply_functions_to_list(strings: list[str], functions: list[Callable[[str], 
             result = list_string_fn(strings, fn)
             ret2 = apply_functions_to_list(result, rest)
             return ret2
+
+
+# write docstring for this function.
+def apply_delimiter_fn(delimiters: list[str]):
+    """
+    Creates a function that applies a series of delimiter-based split functions to a given line.
+
+    This function takes a list of delimiters, creates corresponding split functions,
+    and returns a new function that, when called with a line, will apply those split functions
+    recursively to the line.
+
+    Parameters:
+    delimiters (list[str]): A list of delimiter strings used to create the splitter functions.
+
+    Returns:
+    Callable[[str], list[str]]: A function that, given a line, returns a list of strings
+    resulting from applying the splitter functions.
+    """
+    splitter_fns = create_splitters(delimiters)
+    def apply_fn(line):
+        return apply_functions_to_list([line], splitter_fns)
+    return apply_fn

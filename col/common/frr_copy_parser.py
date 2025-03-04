@@ -7,39 +7,9 @@ import pandas as pd
 from datetime import timedelta
 from col.common.monadic import safer_exec,Maybe
 from col.common.split_by import split_by
-from col.common.utils import convert_to_val
+from col.common.utils import (convert_to_val, split_on_fn, apply_delimiter_fn)
+
 from typing import Callable
-
-
-def split_on_fn(delimiter: str) -> Callable[[str], Maybe]:
-
-    def split_on(line: str) -> Maybe:
-        if line is not None:
-            fields = line.split(delimiter)
-            if len(fields) > 1:
-                return Maybe(fields)
-            return Maybe(fields, is_ok=False)
-        return Maybe("String is None", is_ok=False)
-
-    return split_on
-
-def split_on_fn_multi(args: list[str] ):
-    list_of_fn = [ split_on_fn(delim) for delim in args ]
-    return list_of_fn
-
-def try_split(line: str, fn_iter: list[Callable[[str], Maybe]]) -> Maybe:
-    pass
-
-
-
-
-
-
-
-
-
-
-
 
 
 def parse_time_str(time_str):
@@ -59,6 +29,7 @@ def merge_lines(init: dict, line)->dict:
         output_arr[-1] = output_arr[-1] + line
     else:
         output_arr.append(line + "\t")
+
     line_nr +=1
     return {"line_nr": line_nr, "output": output_arr}
 
@@ -169,9 +140,8 @@ def make_performance_dataframe(list_fields: list[list[str]]):
     # df['polka'] = df['polka'].apply(parse_score)
     # df['sprint'] = df['sprint'].apply(parse_score)
     # df['total'] = df['total'].apply(parse_score)
-
+    ic(df)
     return df
-
 
 def parse_lines(content: list[str]):
     vals= reduce(merge_lines,content,{"line_nr":1, "output": []})
@@ -180,11 +150,9 @@ def parse_lines(content: list[str]):
     len_lst = len(vals['output'])
     print(f"{len_lst}  lines: {vals['line_nr']}" )
 
-    # split upp all the lines into fields.
-    split_fn= split_on_fn('\t')
-    lst = [ split_fn(line ).val for line in vals['output'] ]
-    #ic(lst[0])
-    # Now we need some cleaning.
+    line_splitter = apply_delimiter_fn(['\t', '        '])
+    lst = [line_splitter(line) for line in vals['output']]
+
     return(lst)
 
 
@@ -194,7 +162,7 @@ def parse_file(file_name: str) -> pd.DataFrame:
 
     lst = parse_lines(lines)
     ic(lst)
-    #df = make_performance_dataframe(lst)
+    df = make_performance_dataframe(lst)
     return df
 
 
