@@ -28,7 +28,7 @@ def split_on_fn_multi(args: list[str] ):
     return list_of_fn
 
 def try_split(line: str, fn_iter: list[Callable[[str], Maybe]]) -> Maybe:
-
+    pass
 
 
 

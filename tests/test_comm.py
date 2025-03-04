@@ -9,6 +9,7 @@ from pdb import set_trace
 import pandas as pd
 from icecream import ic
 from col.plot.plot import filter_by, make_plot_handler
+from col.common.utils import list_string_fn, split_on_fn, apply_functions_to_list
 import numpy as np
 
 # import pytest
@@ -119,7 +120,10 @@ class TestMonadics(unittest.TestCase):
         maybe_not_ok = Maybe(10, False)
         self.assertEqual(repr(maybe_not_ok), "Maybe(val=10, is_ok=False)")
 
-    def test_make_plot_handler(self):
+        ###########################################################################
+        #                Deprectated for now
+        ###############################################################################
+    def make_plot_handler(self):
         df = make_df()
 
         # Make a filter function using filter_by
@@ -130,3 +134,127 @@ class TestMonadics(unittest.TestCase):
         arr = np.full(5, np.nan)
         out = handler_fn({"data": df, "value": arr, "index": 3}, df)
         ic(out)
+
+
+    def test_multi_split(self):
+        '''The idea is to use something called multisplit
+
+        think of the function
+        multi_split:: [string] -> [fns] -> [strings]
+        basically multi split will take
+        ['A-B','C D','E-F']
+        and a list of functions that splits
+        space_split:: string -> [string]
+        neg_split:: string -> [string]
+
+        so the call would look like
+        multi_plit(['A-B','C D-E','F-G'], [space_split,neg_split])
+        Which will return
+        ['A','B','C','D','E','F','G]
+
+        The algorithm:
+        exec_split:: string -> split_fn -> Maybe[[string]]
+        This just executes the split_fn with argument string.
+        If its successful it will return a Maybe.
+
+        Now lets go move up one step
+        exec_fns: [string] -> split_fn -> Maybe[[string]]
+
+        the argument is a list of string, and a function.
+        for each of the item in the list we run the exec_split
+        so in case:
+        exec_fns::['A-B','C D-E','F-G'] -> space_split -> ['A-B','C','D-E','F-G']
+
+        If we now take that output list ['A-B','C','D-E','F-G']
+        and use that as input to the other function we get
+        exec_fns::['A-B','C','D-E','F-G'] -> neg_split -> ['A','B','C','D','E','F','G']
+        '''
+        split_on_space = split_on_fn(' ')
+        split_on_neg_sign = split_on_fn('-')
+
+        out = list_string_fn(['A-B','C','D-E','F-G'], split_on_space)
+        out = list_string_fn(out, split_on_neg_sign)
+        ic(out)
+        self.assertEqual(out, ['A','B','C','D','E','F','G'])
+
+        # The out is now a list of MaybeObjects
+        # We dont actually care if it split or did not
+        # so we need to create a list for each of the items
+        # [Maybe(val=['A-B'], is_ok=False),
+        # Maybe(val=['C'], is_ok=False),
+        # Maybe(val=['D-E'], is_ok=False),
+        # Maybe(val=['F-G'], is_ok=False)]
+        # take the val and append it.. (the question is why it is false?)
+
+        # So in essence we have a list of strings that we apply the
+        # The concept ....
+        # 1. take first item from the string list ['A-B']
+        # 2. run each of the functions on that.
+        # 3.
+        multi_out = apply_functions_to_list(['A-B Q','C D','E-F'], [split_on_space, split_on_neg_sign ])
+        self.assertEqual(multi_out, ['A','B','Q','C','D','E','F'])
+        #Continue with more unit test for apply_functions_to_list function
+
+
+    def test_empty_input(self):
+        """Test with empty list input"""
+        result = apply_functions_to_list([], [split_on_fn(' '), split_on_fn('-')])
+        self.assertEqual(result, [])
+
+    def test_no_splitting_functions(self):
+        """Test with no splitting functions"""
+        result = apply_functions_to_list(['A-B', 'C', 'D-E', 'F-G'], [])
+        self.assertEqual(result, ['A-B', 'C', 'D-E', 'F-G'])
+
+    def test_single_function(self):
+        """Test with a single splitting function"""
+        split_on_space = split_on_fn(' ')
+        result = apply_functions_to_list(['A-B Q', 'C D'], [split_on_space])
+        self.assertEqual(result, ['A-B', 'Q', 'C', 'D'])
+
+    def test_repetitive_splitting_functions(self):
+        """Test with multiple same splitting functions"""
+        split_on_space = split_on_fn(' ')
+        result = apply_functions_to_list(['A-B Q C-D'], [split_on_space, split_on_space])
+        self.assertEqual(result, ['A-B', 'Q', 'C-D'])
+
+    def test_chained_splitting(self):
+        """Test with chaining different splitting functions"""
+        split_on_space = split_on_fn(' ')
+        split_on_neg_sign = split_on_fn('-')
+        result = apply_functions_to_list(['A-B Q C-D'], [split_on_space, split_on_neg_sign])
+        self.assertEqual(result, ['A', 'B', 'Q', 'C', 'D'])
+
+    def test_mixed_delimiters(self):
+        """Test with mixed delimiters"""
+        split_on_space = split_on_fn(' ')
+        split_on_neg_sign = split_on_fn('-')
+        result = apply_functions_to_list(['A-B Q-C D'], [split_on_space, split_on_neg_sign])
+        self.assertEqual(result, ['A', 'B', 'Q', 'C', 'D'])
+
+    def test_no_matches(self):
+        """Test when no matches occur"""
+        split_on_space = split_on_fn(',')
+        result = apply_functions_to_list(['A-B Q C-D'], [split_on_space])
+        self.assertEqual(result, ['A-B Q C-D'])
+
+    def test_nested_lists(self):
+        """Test with nested lists"""
+        split_on_space = split_on_fn(' ')
+        result = apply_functions_to_list(['A-B Q', 'C D'], [split_on_space, split_on_fn('-')])
+        self.assertEqual(result, ['A', 'B', 'Q', 'C', 'D'])
+
+    def test_combined_splitting_functions(self):
+        """Test combined splitting functions"""
+        split_on_space = split_on_fn(' ')
+        split_on_neg_sign = split_on_fn('-')
+        result = apply_functions_to_list(['A-B-C Q D-E'], [split_on_space, split_on_neg_sign])
+        self.assertEqual(result, ['A', 'B', 'C', 'Q', 'D', 'E'])
+
+
+    def test_real_input(self):
+        split_on_tab = split_on_fn('\t')
+        split_on_8spaces = split_on_fn('        ')
+        result = apply_functions_to_list(["1	M-GHT	Calle Olsen [SZ]        SZ	50+"], [split_on_tab, split_on_8spaces])
+
+        ic(result)
