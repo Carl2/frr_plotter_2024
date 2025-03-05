@@ -8,8 +8,8 @@ from datetime import datetime,timedelta
 from pdb import set_trace
 from icecream import ic
 from col.common.split_by import split_by
-
-from col.common.frr_copy_parser import parse_lines
+from col.common.utils import apply_delimiter_fn
+from col.common.frr_copy_parser import parse_lines,create_merge_fn
 # import pytest
 # import sys  # For modifying sys.path temporarily if necessary
 # import src.game_engine.data.messages as msg
@@ -162,3 +162,17 @@ class TestFrrParser(unittest.TestCase):
 1	M-GHT	Calle Olsen [SZ]        SZ	50+"""
         lst = parse_lines([line])
         self.assertEqual(lst, [['1', 'M-GHT', 'Calle Olsen [SZ]', 'SZ', '50+', '']] )
+
+
+    def test_merge_parser(self):
+        #This is a new implementation.
+        # instead of doing in a sequence, we merge and split at the same time
+
+        #Firstly we need to define the splitter functions.
+        line_splitter = apply_delimiter_fn(['\t', '        '])
+        #this is then used to help with creating a mergin function
+        merging_fn = create_merge_fn(line_splitter)
+        # Merging function (supposte to used with reduce)
+        # takes a init dictionary
+        vals=merging_fn({"line_nr":1 , "output": []} , "A	B	C	D")
+        ic(vals)
