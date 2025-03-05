@@ -22,17 +22,22 @@ def parse_time_str(time_str):
                      seconds=seconds, milliseconds=milli)
 
 
-def merge_lines(init: dict, line)->dict:
-    line_nr = init['line_nr']
-    output_arr = init['output']
-    if line_nr % 2 == 0:
-        output_arr[-1] = output_arr[-1] + line
-    else:
-        output_arr.append(line + "\t")
+def create_merge_fn(splitter: Callable[[str],list[str]])->list[str]:
 
-    line_nr +=1
-    return {"line_nr": line_nr, "output": output_arr}
+    def merge_lines(init: dict, line)->dict:
+        line_nr = init['line_nr']
+        output_arr = init['output']
+        #user_lst = init.get("user_lst",[])
+        if line_nr % 2 == 0:
+            output_arr[-1] = output_arr[-1] + line
+        else:
+            ic(splitter(line))
+            #user_lst = splitter(line)
+            output_arr.append(line + "\t")
 
+        line_nr +=1
+        return {"line_nr": line_nr, "output": output_arr}
+    return merge_lines
 
 def convert_str_array_to_int(arr: list[str]) -> Maybe[list[int]]:
     """Converts a list of strings to a list of integers.
@@ -144,13 +149,13 @@ def make_performance_dataframe(list_fields: list[list[str]]):
     return df
 
 def parse_lines(content: list[str]):
-    vals= reduce(merge_lines,content,{"line_nr":1, "output": []})
-
-
+    line_splitter = apply_delimiter_fn(['\t', '        '])
+    merge_lines = create_merge_fn(line_splitter)
+    vals= reduce(merge_lines,content,{"line_nr":1, "output": [],"splitter": line_splitter})
     len_lst = len(vals['output'])
     print(f"{len_lst}  lines: {vals['line_nr']}" )
 
-    line_splitter = apply_delimiter_fn(['\t', '        '])
+    #line_splitter = apply_delimiter_fn(['\t', '        '])
     lst = [line_splitter(line) for line in vals['output']]
 
     return(lst)

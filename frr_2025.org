@@ -140,3 +140,39 @@ The eassiest way is to add if its missing on the first line.
 This can be done in [[file:col/common/frr_copy_parser.py::def merge_lines(init: dict, line)->dict:][merge_lines]]
 in the =else= clause. If the number of fields are 4 then we need to add a field, but we havent split it?
 Shit! Need to rethink!...
+
+The problem is this:
+
+#+begin_example
+1	M-GHT	Jörgen Lindwall [SZ]	SZ
+1	M-GHT	Calle Olsen [SZ]        SZ	50+
+#+end_example
+
+The first line has one less field. Which is not what we want.
+And since we are smashing the two lines together we get:
+#+begin_example
+1	M-GHT	Calle Olsen [SZ]        SZ	50+  6.804 s	1 hrs, 4 m 34.246 s 235w @3.70WKG	758 - 740 - 776	(0) - (0)	2.274
+1	M-GHT	Jörgen Lindwall [SZ]	SZ  1 m 2.579 s	1 hrs, 5 m 30.021 s 274w @3.70WKG	704 - 712 - 744	(0) - (0)	2.160
+#+end_example
+
+So how do we find a pattern that knows that a field is missing?
+We haven't split anything yet, that is done in the next stage.
+At this point we have just a string of text.
+
+The best way would be to split the bloody thing before merging.
+
+Ok , that needs a refactoring.
+First we need to extend the input to merge_lines, with =splitter_fn=
+
+The next thing is to create a new list that includes the first line
+#+begin_example
+ user_lst = ['1','apaa',.....]
+#+end_example
+
+The next line should be appended to the first
+
+#+begin_example
+ user_lst.extend(splitter(line))
+ #+end_example
+
+ Now this should be appended to the output_arr...
