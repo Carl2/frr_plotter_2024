@@ -25,18 +25,17 @@ def parse_time_str(time_str):
 def create_merge_fn(splitter: Callable[[str],list[str]])->list[str]:
 
     def merge_lines(init: dict, line)->dict:
-        line_nr = init['line_nr']
+        line_nr = init.get('line_nr',1)
         output_arr = init['output']
-        #user_lst = init.get("user_lst",[])
+        split_arr = []
         if line_nr % 2 == 0:
-            output_arr[-1] = output_arr[-1] + line
+            complete_split = init['tmp_split'] + splitter(line)
+            output_arr = output_arr + complete_split
         else:
-            ic(splitter(line))
-            #user_lst = splitter(line)
-            output_arr.append(line + "\t")
+            split_arr = splitter(line)
 
         line_nr +=1
-        return {"line_nr": line_nr, "output": output_arr}
+        return {"line_nr": line_nr, "output": output_arr , "tmp_split": split_arr }
     return merge_lines
 
 def convert_str_array_to_int(arr: list[str]) -> Maybe[list[int]]:

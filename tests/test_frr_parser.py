@@ -174,5 +174,13 @@ class TestFrrParser(unittest.TestCase):
         merging_fn = create_merge_fn(line_splitter)
         # Merging function (supposte to used with reduce)
         # takes a init dictionary
-        vals=merging_fn({"line_nr":1 , "output": []} , "A	B	C	D")
+        #set_trace()
+        vals=merging_fn({"output": []} , "A	B	C	D")
         ic(vals)
+        vals=merging_fn({"line_nr":2 ,
+                        "output": [],
+                        "tmp_split": vals['tmp_split']},
+                        "E	F	G	H")
+        self.assertEqual(['A','B','C','D','E','F','G','H'], vals['tmp_split'])
+        # We manage to do one! Now we remove the old string and add the output_arr
+        # to be the list of list instead.
