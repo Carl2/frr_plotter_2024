@@ -25,14 +25,19 @@ def parse_time_str(time_str):
 def create_merge_fn(splitter: Callable[[str],list[str]])->list[str]:
 
     def merge_lines(init: dict, line)->dict:
+        line = line.rstrip()
         line_nr = init.get('line_nr',1)
-        output_arr = init['output']
+        output_arr = init.get('output',[])
         split_arr = []
         if line_nr % 2 == 0:
             complete_split = init['tmp_split'] + splitter(line)
-            output_arr = output_arr + complete_split
+            output_arr.append(complete_split)
         else:
             split_arr = splitter(line)
+            # Here is a fix.. Some users dont have mas,50+,60+ and so
+            # on, this fix adds a U to that... For Unkown?!?..
+            if len(split_arr) < 5:
+                split_arr.append('U')
 
         line_nr +=1
         return {"line_nr": line_nr, "output": output_arr , "tmp_split": split_arr }
@@ -155,9 +160,9 @@ def parse_lines(content: list[str]):
     print(f"{len_lst}  lines: {vals['line_nr']}" )
 
     #line_splitter = apply_delimiter_fn(['\t', '        '])
-    lst = [line_splitter(line) for line in vals['output']]
+    #lst = [line_splitter(line) for line in vals['output']]
 
-    return(lst)
+    return vals['output']
 
 
 def parse_file(file_name: str) -> pd.DataFrame:

@@ -152,16 +152,15 @@ class TestFrrParser(unittest.TestCase):
 
     #Well this wasn't so easy to test. But it should work
     def test_parse_line_no_space(self):
-        line = """\
-1	M-GHT	Mathias de Paulis Nilsson	SZ"""
-        lst = parse_lines([line])
-        self.assertEqual(lst, [['1', 'M-GHT', 'Mathias de Paulis Nilsson', 'SZ','']] )
+        line1 = """\
+1	M-GHT	Mathias de Paulis Nilsson	SZ
+"""
+        line2 = """\
+6.804 s	1 hrs, 4 m 34.246 s 235w @3.70WKG	758 - 740 - 776	(0) - (0)	2.274
+"""
 
-    def test_parse_lines_with_space(self):
-        line = """\
-1	M-GHT	Calle Olsen [SZ]        SZ	50+"""
-        lst = parse_lines([line])
-        self.assertEqual(lst, [['1', 'M-GHT', 'Calle Olsen [SZ]', 'SZ', '50+', '']] )
+        lst = parse_lines([line1, line2])
+        self.assertEqual(lst, [['1', 'M-GHT', 'Mathias de Paulis Nilsson', 'SZ' ,'U' , '6.804 s','1 hrs, 4 m 34.246 s 235w @3.70WKG','758 - 740 - 776','(0) - (0)','2.274']] )
 
 
     def test_merge_parser(self):
@@ -174,13 +173,25 @@ class TestFrrParser(unittest.TestCase):
         merging_fn = create_merge_fn(line_splitter)
         # Merging function (supposte to used with reduce)
         # takes a init dictionary
-        #set_trace()
-        vals=merging_fn({"output": []} , "A	B	C	D")
-        ic(vals)
+
+        # The U is added since the exp is missing... (len < 5 of the first row)
+        vals=merging_fn({} , "A	B	C	D")
         vals=merging_fn({"line_nr":2 ,
                         "output": [],
                         "tmp_split": vals['tmp_split']},
                         "E	F	G	H")
-        self.assertEqual(['A','B','C','D','E','F','G','H'], vals['tmp_split'])
+        self.assertEqual([['A','B','C','D','U','E','F','G','H']], vals['output'])
         # We manage to do one! Now we remove the old string and add the output_arr
         # to be the list of list instead.
+        vals=merging_fn({"line_nr":3 ,
+                        "output": vals['output'],
+                        "tmp_split": vals['tmp_split']},
+                        "I	J	K	L")
+        vals=merging_fn({"line_nr":4 ,
+                        "output": vals['output'],
+                        "tmp_split": vals['tmp_split']},
+                        "M	N	O	P        Q")
+        self.assertEqual([['A','B','C','D','U','E','F','G','H'],
+                          ['I','J','K','L','U','M','N','O','P','Q']],
+                         vals['output'])
+        ic(vals)
