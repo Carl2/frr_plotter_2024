@@ -128,6 +128,14 @@ def parse_score(score_str: str) -> int:
         score_str = score_str.replace(".", "")
     return int(score_str)
 
+def parse_psf(psf_str: str) -> list(tuple[str,str,str]):
+    psf_arr = psf_str.split('-')
+    polka = int(psf_arr[0].rstrip())
+    sprint = int(psf_arr[1].rstrip())
+    finish = int(psf_arr[2].rstrip())
+
+    return pd.Series(data=(polka,sprint,finish, polka+sprint+finish))
+
 
 def make_performance_dataframe(list_fields: list[list[str]]):
     """
@@ -142,14 +150,11 @@ def make_performance_dataframe(list_fields: list[list[str]]):
     header = ['stage', 'class', 'name', 'club', 'exp', 'egap', 'effort', 'P-S-F', 'vbw-upg', 'total']
     df = pd.DataFrame(data=list_fields, columns=header)
     #ic(df)
-    # new_columns = df['effort'].apply(parse_effort).apply(pd.Series)
-    # new_columns.columns = ['watts', 'wkg', 'time_delta']
-    # df = pd.concat([df, new_columns], axis=1)
-    # df['egap_td'] = df['egap'].apply(parse_egap)
-    # df['polka'] = df['polka'].apply(parse_score)
-    # df['sprint'] = df['sprint'].apply(parse_score)
-    # df['total'] = df['total'].apply(parse_score)
-    ic(df)
+    new_columns = df['effort'].apply(parse_effort).apply(pd.Series)
+    new_columns.columns = ['watts', 'wkg', 'time_delta']
+    df = pd.concat([df, new_columns], axis=1)
+    df['egap_td'] = df['egap'].apply(parse_egap)
+    df[['polka', 'sprint', 'finish', 'total']] = df['P-S-F'].apply(parse_psf)
     return df
 
 def parse_lines(content: list[str]):

@@ -171,9 +171,7 @@ def main():
     #     return
 
     # if st.button("Generate Plots"):
-    df = parse_file("tezt_2025_wt.txt")  # Commented out original file reading line
-    ic(df)
-    return
+    df = parse_file("./tezt_world.txt")  # Commented out original file reading line
     #     #df = parse_file(text_stream)
 
     # Convert text input to a temporary file-like object
