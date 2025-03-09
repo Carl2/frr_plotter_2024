@@ -157,8 +157,8 @@ def form_data():
 
 
 def main():
-    #st.title("FRR Parser")
-    #st.write("Paste FRR data below (same format as tezt.txt):")
+    st.title("FRR Parser")
+    st.write("Paste FRR data below (same format as tezt.txt):")
     # TODO: THis not complete.
     #df = form_data()
 
@@ -289,6 +289,19 @@ def main():
         lambda x, y: handler(x, y),
         sprint_config_sum)
 
+    fig,handler = generate_matplot_handler(total_config)
+    _ = make_stage_plot_by_name2(
+        df, 'stage', 'name',
+        fn_streamlit(fig, "Rider Total score/stage", "total"),
+        lambda x, y: handler(x, y),
+        total_config)
+
+    fig,handler = generate_matplot_handler(total_config_sum)
+    _ = make_stage_plot_by_name2(
+        df, 'stage', 'name',
+        fn_streamlit(fig, "Rider Total score accumulated", "total"),
+        lambda x, y: handler(x, y),
+        total_config_sum)
 
     st.header("Data Table")
     st.dataframe(df_data)
