@@ -1,0 +1,487 @@
+<br />
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-12-22 Sun 11:54 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="author" content="calle" />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/bigblow_theme/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/bigblow_theme/css/bigblow.css"/>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/bigblow_theme/css/hideshow.css"/>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/bigblow_theme/js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/bigblow_theme/js/jquery-ui-1.10.2.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/bigblow_theme/js/jquery.localscroll-min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/bigblow_theme/js/jquery.scrollTo-1.4.3.1-min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/bigblow_theme/js/jquery.zclip.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/bigblow_theme/js/bigblow.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/bigblow_theme/js/hideshow.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/lib/js/jquery.stickytableheaders.min.js"></script>
+</head>
+<body>
+<div id="content" class="content">
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org753fc4b">1. Overview</a></li>
+<li><a href="#org6abb164">2. Visual approach</a>
+<ul>
+<li><a href="#orgdc227e5">2.1. Communication endpoint</a></li>
+<li><a href="#org635cb36">2.2. Headers</a></li>
+<li><a href="#org85c2aac">2.3. Streaming</a></li>
+</ul>
+</li>
+<li><a href="#org886ad16">3. Defining what i want</a>
+<ul>
+<li><a href="#org7bf49fd">3.1. Data openrouter</a></li>
+<li><a href="#orgc74bb7c">3.2. Data Ollama</a></li>
+</ul>
+</li>
+<li><a href="#org9c9ff3c">4. Using structure.</a></li>
+<li><a href="#orge3a8b21">5. Resources</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org753fc4b" class="outline-2">
+<h2 id="org753fc4b"><span class="section-number-2">1.</span> Overview</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+I want to create my own AI communication module. The reason is that I
+don't like the approach of Lanchain and llamaindex and so on. For me
+they dont feel natural. Now, maybe my approach isnt natural for some
+one else, but they always have a choice. Now I know my limitation
+(espcially when it comes to time), but i really want to have more
+control over the workflow, and make it a more functional approach,
+that means will have a pipeline that can be used.
+</p>
+</div>
+</div>
+<div id="outline-container-org6abb164" class="outline-2">
+<h2 id="org6abb164"><span class="section-number-2">2.</span> Visual approach</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Lets first break down what is needed to talk to a AI, in a more
+abstract way
+</p>
+</div>
+<div id="outline-container-orgdc227e5" class="outline-3">
+<h3 id="orgdc227e5"><span class="section-number-3">2.1.</span> Communication endpoint</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+To connect to an AI we need an end point , now what is a endpoint in
+this sense.
+</p>
+<ul class="org-ul">
+<li>host</li>
+<li>port</li>
+<li>path</li>
+</ul>
+
+<p>
+This is the first puzzle piece, and quite crucial.  This data needs to
+be stored and passed around.  Of course we talking about a struct or a
+dictionary.  I think dictionary is simpler, and it doesn't make sense
+to make something new
+</p>
+
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">endpoint_ollama</span> <span class="org-operator">=</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-string">"host"</span>: <span class="org-string">"localhost:11434"</span>,
+    <span class="org-string">"path"</span>: <span class="org-string">"api/generate"</span>
+<span class="org-rainbow-delimiters-depth-1">}</span>
+<span class="org-variable-name">endpoint_openrouter</span> <span class="org-operator">=</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-string">"host"</span>: <span class="org-string">"openrouter.ai"</span>,
+    <span class="org-string">"path"</span>: <span class="org-string">"/api/v1/chat/completions"</span>
+<span class="org-rainbow-delimiters-depth-1">}</span>
+</pre>
+</div>
+
+<p>
+Now the path have some different construct.
+</p>
+<dl class="org-dl">
+<dt>generate</dt><dd>Text generation, for example code completion, creative writing and so on.</dd>
+<dt>completion</dt><dd>Often more general pupose , and can be used for
+completing text, summarizing, or transforming text based on
+specific instructions. string prompt but might also support additional parameters like temperature, max tokens, etc.</dd>
+</dl>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Feature</th>
+<th scope="col" class="org-left">/generate or /completion</th>
+<th scope="col" class="org-left">/chat/completions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Input Type</td>
+<td class="org-left">Single string prompt</td>
+<td class="org-left">Structured messages with roles</td>
+</tr>
+
+<tr>
+<td class="org-left">Context Handling</td>
+<td class="org-left">Manual (append previous outputs)</td>
+<td class="org-left">Manual (via `messages` array)</td>
+</tr>
+
+<tr>
+<td class="org-left">Use Case Focus</td>
+<td class="org-left">General text generation</td>
+<td class="org-left">Conversational AI/chatbots</td>
+</tr>
+
+<tr>
+<td class="org-left">Model Optimization</td>
+<td class="org-left">Legacy models (e.g., text-davinci)</td>
+<td class="org-left">Chat-focused models (e.g., gpt-turbo)</td>
+</tr>
+
+<tr>
+<td class="org-left">Flexibility</td>
+<td class="org-left">More flexible for non-chat tasks</td>
+<td class="org-left">Better suited for dialogue-based tasks</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="outline-container-org635cb36" class="outline-3">
+<h3 id="org635cb36"><span class="section-number-3">2.2.</span> Headers</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+Header is another topic, which want change to much in a conversation.
+Though there are some aspects that can be quite useful
+</p>
+
+
+<div class="org-src-container">
+<pre class="src src-bash" id="orgff7d076">
+curl -X POST http://localhost:11434/api/generate <span class="org-sh-escaped-newline">\</span>
+-H <span class="org-string">"Content-Type: application/json"</span> <span class="org-sh-escaped-newline">\</span>
+-H <span class="org-string">"Date: $(date -u +"%a, %d %b %Y %H:%M:%S GMT")"</span> <span class="org-sh-escaped-newline">\</span>
+-H <span class="org-string">"Client-Request-ID: $(uuidgen)"</span> <span class="org-sh-escaped-newline">\</span>
+-d <span class="org-string">'{</span>
+<span class="org-string">  "model": "qwen2.5-coder:latest",</span>
+<span class="org-string">  "prompt": "Explain the concept of artificial intelligence in simple terms. be short and consice!",</span>
+<span class="org-string">  "stream": false</span>
+<span class="org-string">}'</span>
+</pre>
+</div>
+
+<pre class="example" id="orga8fb95a">
+{"model":"qwen2.5-coder:latest","created_at":"2024-12-20T09:32:27.755448543Z","response":"Artificial Intelligence (AI) is when computers simulate human-like thinking and actions using algorithms and machine learning. It helps machines learn from data, make decisions, and perform tasks that typically require human intelligence. AI can recognize patterns, solve problems, understand languages, and even create art or music. Essentially, it makes machines smarter!","done":true,"done_reason":"stop","context":[151644,8948,198,2610,525,1207,16948,11,3465,553,54364,14817,13,1446,525,264,10950,17847,13,151645,198,151644,872,198,840,20772,279,7286,315,20443,11229,304,4285,3793,13,387,2805,323,1585,558,0,151645,198,151644,77091,198,9286,16488,21392,320,15469,8,374,979,18495,37453,3738,12681,7274,323,6168,1667,25185,323,5662,6832,13,1084,8609,12645,3960,504,821,11,1281,11181,11,323,2736,9079,429,11136,1373,3738,11229,13,15235,646,15282,12624,11,11625,5322,11,3535,15459,11,323,1496,1855,1947,476,4627,13,70754,11,432,3643,12645,46478,0],"total_duration":5167705170,"load_duration":2192361816,"prompt_eval_count":46,"prompt_eval_duration":100317000,"eval_count":66,"eval_duration":2831215000}
+</pre>
+
+<p>
+Lets try this with <i>python</i> instead
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python" id="orgbec66a4"><span class="org-keyword">import</span> urllib3
+<span class="org-keyword">import</span> json
+
+<span class="org-variable-name">http</span> <span class="org-operator">=</span> urllib3.PoolManager<span class="org-rainbow-delimiters-depth-1">()</span>
+
+<span class="org-keyword">def</span> <span class="org-function-name">generate_request</span><span class="org-rainbow-delimiters-depth-1">(</span>url, model, prompt<span class="org-rainbow-delimiters-depth-1">)</span>:
+    <span class="org-variable-name">headers</span> <span class="org-operator">=</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-indent-bars-1"> </span>   <span class="org-string">"Content-Type"</span>: <span class="org-string">"application/json"</span>,
+    <span class="org-indent-bars-1"> </span>   <span class="org-string">"Client-Request-ID"</span>: <span class="org-string">"23040"</span>
+    <span class="org-rainbow-delimiters-depth-1">}</span>
+
+    <span class="org-variable-name">data</span> <span class="org-operator">=</span> json.dumps<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-rainbow-delimiters-depth-2">{</span>
+    <span class="org-indent-bars-1"> </span>   <span class="org-string">"model"</span>: model,
+    <span class="org-indent-bars-1"> </span>   <span class="org-string">"prompt"</span>: prompt,
+    <span class="org-indent-bars-1"> </span>   <span class="org-string">"stream"</span>: <span class="org-constant">True</span>
+    <span class="org-rainbow-delimiters-depth-2">}</span><span class="org-rainbow-delimiters-depth-1">)</span>
+
+    <span class="org-variable-name">response</span> <span class="org-operator">=</span> http.request<span class="org-rainbow-delimiters-depth-1">(</span>
+    <span class="org-indent-bars-1"> </span>   method<span class="org-operator">=</span><span class="org-string">"POST"</span>,
+    <span class="org-indent-bars-1"> </span>   url<span class="org-operator">=</span>url,
+    <span class="org-indent-bars-1"> </span>   headers<span class="org-operator">=</span>headers,
+    <span class="org-indent-bars-1"> </span>   body<span class="org-operator">=</span>data,
+    <span class="org-rainbow-delimiters-depth-1">)</span>
+
+    <span class="org-keyword">return</span> response
+
+<span class="org-variable-name">url</span> <span class="org-operator">=</span> <span class="org-string">"http://localhost:11434/api/generate"</span>
+<span class="org-variable-name">model</span> <span class="org-operator">=</span> <span class="org-string">"qwen2.5-coder:latest"</span>
+<span class="org-variable-name">prompt</span> <span class="org-operator">=</span> <span class="org-string">"What are the consequences of AI?"</span>
+
+<span class="org-variable-name">response</span> <span class="org-operator">=</span> generate_request<span class="org-rainbow-delimiters-depth-1">(</span>url, model, prompt<span class="org-rainbow-delimiters-depth-1">)</span>
+<span class="org-builtin">print</span><span class="org-rainbow-delimiters-depth-1">(</span>f<span class="org-string">"</span>{response.status}<span class="org-string">, </span>{response.headers}<span class="org-string">,</span><span class="org-constant">\n\n</span><span class="org-string"> </span>{response.data.decode('utf<span class="org-operator">-</span>8')}<span class="org-string">"</span><span class="org-rainbow-delimiters-depth-1">)</span>
+
+</pre>
+</div>
+
+<pre class="example" id="org73baeba">
+404, HTTPHeaderDict({'Content-Type': 'application/json; charset=utf-8', 'Date': 'Sun, 22 Dec 2024 10:54:00 GMT', 'Content-Length': '50'}),
+
+ {"error":"model 'qwen2.5-coder:latest' not found"}
+</pre>
+</div>
+</div>
+<div id="outline-container-org85c2aac" class="outline-3">
+<h3 id="org85c2aac"><span class="section-number-3">2.3.</span> Streaming</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+Its one thing to read everything into a buffer and then output it, its another to take care of the stream.
+</p>
+
+<p>
+(setq python-shell-unbuffered "python -u")
+</p>
+<div class="org-src-container">
+<pre class="src src-python" id="org5b3c209"><span class="org-keyword">import</span> urllib3
+<span class="org-keyword">import</span> json
+
+<span class="org-variable-name">http</span> <span class="org-operator">=</span> urllib3.PoolManager<span class="org-rainbow-delimiters-depth-1">()</span>
+
+
+<span class="org-variable-name">headers</span> <span class="org-operator">=</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-string">"Content-Type"</span>: <span class="org-string">"application/json"</span>,
+    <span class="org-string">"Client-Request-ID"</span>: <span class="org-string">"23040"</span>
+<span class="org-rainbow-delimiters-depth-1">}</span>
+
+<span class="org-variable-name">data</span> <span class="org-operator">=</span> json.dumps<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-rainbow-delimiters-depth-2">{</span>
+    <span class="org-string">"model"</span>: <span class="org-string">"qwen2.5-coder:latest"</span>,
+    <span class="org-string">"prompt"</span>: <span class="org-string">"What are the consequences of AI?"</span>,
+    <span class="org-string">"stream"</span>: <span class="org-constant">True</span>
+<span class="org-rainbow-delimiters-depth-2">}</span><span class="org-rainbow-delimiters-depth-1">)</span>
+
+<span class="org-variable-name">response</span> <span class="org-operator">=</span> http.request<span class="org-rainbow-delimiters-depth-1">(</span>
+    method<span class="org-operator">=</span><span class="org-string">"POST"</span>,
+    url<span class="org-operator">=</span><span class="org-string">"http://localhost:11434/api/generate"</span>,
+    headers<span class="org-operator">=</span>headers,
+    body<span class="org-operator">=</span>data,
+    preload_content<span class="org-operator">=</span><span class="org-constant">False</span>
+<span class="org-rainbow-delimiters-depth-1">)</span>
+
+<span class="org-keyword">for</span> chunk <span class="org-keyword">in</span> response.stream<span class="org-rainbow-delimiters-depth-1">()</span>:
+  <span class="org-variable-name">chunk_data</span> <span class="org-operator">=</span> chunk.decode<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-string">'utf-8'</span><span class="org-rainbow-delimiters-depth-1">)</span>
+  <span class="org-keyword">try</span>:
+    <span class="org-indent-bars-1"> </span> <span class="org-variable-name">json_response</span> <span class="org-operator">=</span> json.loads<span class="org-rainbow-delimiters-depth-1">(</span>chunk_data<span class="org-rainbow-delimiters-depth-1">)</span>
+    <span class="org-indent-bars-1"> </span> <span class="org-keyword">if</span> <span class="org-string">'response'</span> <span class="org-keyword">in</span> json_response:
+    <span class="org-indent-bars-1"> </span>   <span class="org-indent-bars-2"> </span> <span class="org-builtin">print</span><span class="org-rainbow-delimiters-depth-1">(</span>json_response<span class="org-rainbow-delimiters-depth-2">[</span><span class="org-string">'response'</span><span class="org-rainbow-delimiters-depth-2">]</span>, end<span class="org-operator">=</span><span class="org-string">''</span>, flush<span class="org-operator">=</span><span class="org-constant">True</span><span class="org-rainbow-delimiters-depth-1">)</span>
+  <span class="org-keyword">except</span> json.JSONDecodeError:
+    <span class="org-indent-bars-1"> </span> <span class="org-keyword">pass</span>
+
+
+response.release_conn<span class="org-rainbow-delimiters-depth-1">()</span>
+</pre>
+</div>
+
+<pre class="example" id="orgac072c3">
+
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org886ad16" class="outline-2">
+<h2 id="org886ad16"><span class="section-number-2">3.</span> Defining what i want</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org7bf49fd" class="outline-3">
+<h3 id="org7bf49fd"><span class="section-number-3">3.1.</span> Data openrouter</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+First we need the communication <i>endpoint</i>
+an endpoint is defined by what is needed to connect to some
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python">
+
+<span class="org-variable-name">openrouter_endpoint</span> <span class="org-operator">=</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-string">"host"</span>: <span class="org-string">"https://openrouter.ai/api/v1/chat/completions"</span>,
+<span class="org-rainbow-delimiters-depth-1">}</span>
+</pre>
+</div>
+
+<p>
+In order to have some meaningful communication the <i>endpoint</i> needs to
+be in composition with headers, different endpoints needs different headers.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python">
+<span class="org-variable-name">openrouter_headers</span> <span class="org-operator">=</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-string">"Content-Type"</span>: <span class="org-string">"application/json"</span>,
+    <span class="org-string">"Authorization"</span>: <span class="org-string">"Bearer YOUR_OPENROUTER_API_KEY"</span>,
+    <span class="org-string">"HTTP-Referer"</span>: <span class="org-string">"YOUR_SITE_URL"</span>,
+    <span class="org-string">"X-Title"</span>: <span class="org-string">"YOUR_APP_NAME"</span>
+<span class="org-rainbow-delimiters-depth-1">}</span>
+</pre>
+</div>
+
+<p>
+The <i>body</i> needs includes both required and optional parameters
+</p>
+<div class="org-src-container">
+<pre class="src src-python">  <span class="org-variable-name">openrouter_params</span> <span class="org-operator">=</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Required parameters</span>
+    <span class="org-string">"model"</span>: <span class="org-string">"mistralai/ministral-8b"</span>,
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Either "messages" or "prompt" is required</span>
+    <span class="org-string">"messages"</span>: <span class="org-rainbow-delimiters-depth-2">[]</span>,  <span class="org-comment-delimiter"># </span><span class="org-comment">List of message dictionaries</span>
+
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Optional parameters with default values</span>
+    <span class="org-string">"max_tokens"</span>: <span class="org-constant">None</span>,  <span class="org-comment-delimiter"># </span><span class="org-comment">Integer, e.g., 1024</span>
+    <span class="org-string">"temperature"</span>: 0.7,  <span class="org-comment-delimiter"># </span><span class="org-comment">Float between 0-2</span>
+    <span class="org-string">"top_p"</span>: 0.95,  <span class="org-comment-delimiter"># </span><span class="org-comment">Float between 0-1</span>
+    <span class="org-string">"top_k"</span>: <span class="org-constant">None</span>,  <span class="org-comment-delimiter"># </span><span class="org-comment">Integer</span>
+    <span class="org-string">"presence_penalty"</span>: 0.0,  <span class="org-comment-delimiter"># </span><span class="org-comment">Float between -2.0 and 2.0</span>
+    <span class="org-string">"frequency_penalty"</span>: 0.0,  <span class="org-comment-delimiter"># </span><span class="org-comment">Float between -2.0 and 2.0</span>
+    <span class="org-string">"stop"</span>: <span class="org-constant">None</span>,  <span class="org-comment-delimiter"># </span><span class="org-comment">List of strings or None</span>
+    <span class="org-string">"tools"</span>: <span class="org-constant">None</span>,  <span class="org-comment-delimiter"># </span><span class="org-comment">List of tool definitions</span>
+    <span class="org-string">"tool_choice"</span>: <span class="org-constant">None</span>,  <span class="org-comment-delimiter"># </span><span class="org-comment">String or object</span>
+    <span class="org-string">"response_format"</span>: <span class="org-constant">None</span>,  <span class="org-comment-delimiter"># </span><span class="org-comment">Dictionary, e.g., {"type": "json_object"}</span>
+    <span class="org-string">"seed"</span>: <span class="org-constant">None</span>,  <span class="org-comment-delimiter"># </span><span class="org-comment">Integer for reproducibility</span>
+    <span class="org-string">"transforms"</span>: <span class="org-constant">None</span>,  <span class="org-comment-delimiter"># </span><span class="org-comment">List of transformation rules</span>
+    <span class="org-string">"stream"</span>: <span class="org-constant">False</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">Boolean</span>
+<span class="org-rainbow-delimiters-depth-1">}</span>
+
+</pre>
+</div>
+
+<p>
+Some of these are actually structures them selfs.
+For example messages.
+</p>
+
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">message_structure</span> <span class="org-operator">=</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-string">"role"</span>: <span class="org-string">"user"</span>,  <span class="org-comment-delimiter"># </span><span class="org-comment">or "system", "assistant"</span>
+    <span class="org-string">"content"</span>: <span class="org-string">"Your message here"</span>
+<span class="org-rainbow-delimiters-depth-1">}</span>
+
+</pre>
+</div>
+
+<p>
+or as tool use
+</p>
+<div class="org-src-container">
+<pre class="src src-python">  <span class="org-variable-name">tools_structure</span> <span class="org-operator">=</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-string">"type"</span>: <span class="org-string">"function"</span>,
+    <span class="org-string">"function"</span>: <span class="org-rainbow-delimiters-depth-2">{</span>
+    <span class="org-indent-bars-1"> </span>   <span class="org-string">"name"</span>: <span class="org-string">"function_name"</span>,
+    <span class="org-indent-bars-1"> </span>   <span class="org-string">"description"</span>: <span class="org-string">"function description"</span>,
+    <span class="org-indent-bars-1"> </span>   <span class="org-string">"parameters"</span>: <span class="org-rainbow-delimiters-depth-3">{</span>
+    <span class="org-indent-bars-1"> </span>   <span class="org-indent-bars-2"> </span>   <span class="org-string">"type"</span>: <span class="org-string">"object"</span>,
+    <span class="org-indent-bars-1"> </span>   <span class="org-indent-bars-2"> </span>   <span class="org-string">"properties"</span>: <span class="org-rainbow-delimiters-depth-4">{}</span>
+    <span class="org-indent-bars-1"> </span>   <span class="org-rainbow-delimiters-depth-3">}</span>
+    <span class="org-rainbow-delimiters-depth-2">}</span>
+<span class="org-rainbow-delimiters-depth-1">}</span>
+</pre>
+</div>
+
+
+<p>
+So we see some kind of structure of a request.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-artist">                          1      +---------+    1
+                    +------------| Request |-------------+
+                    v            +---------+             v
+              +-------------+                       +----------+
+              | Parameters  |                       | Endpoint |
+              | - various...|                       | - url    |
+              +-------------+                       +----------+
+          1..n      |   1..n                             | 1
+    +---------------+------------+                       +----+
+    v                            v                            v
++-------------+           +-------------+            +------------------+
+| Tools       |           |  Messages   |            | Header           |
+| - type      |           |  - role     |            | - content-type   |
+| - function  |           |  - content  |            | - authoriszation |
++-------------+           +-------------+            +------------------+
+
+
+
+
+
+</pre>
+</div>
+
+<p>
+This is somewhat a design descition. But this kind of make sense.
+Its somewhat different for <i>ollama</i> where the parameters are reffered to as opti
+</p>
+</div>
+</div>
+<div id="outline-container-orgc74bb7c" class="outline-3">
+<h3 id="orgc74bb7c"><span class="section-number-3">3.2.</span> Data Ollama</h3>
+<div class="outline-text-3" id="text-3-2">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">ollama_endpoint</span> <span class="org-operator">=</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-string">"url"</span>: <span class="org-string">"http://localhost:11434/api/generate"</span>
+<span class="org-rainbow-delimiters-depth-1">}</span>
+
+<span class="org-variable-name">ollama_header</span> <span class="org-operator">=</span> <span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-string">"Content-Type"</span>: <span class="org-string">"application/json"</span>,
+    <span class="org-string">"Client-Request-ID"</span>: <span class="org-string">"23040"</span>,
+    <span class="org-string">"Authorization"</span>: <span class="org-string">"Basic SECRET"</span>
+<span class="org-rainbow-delimiters-depth-1">}</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org9c9ff3c" class="outline-2">
+<h2 id="org9c9ff3c"><span class="section-number-2">4.</span> Using structure.</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+First lest se consisder that the endpoint would basically not be changed a lot.
+In an ideal world I would like to se something like
+</p>
+
+
+<div class="org-src-container">
+<pre class="src src-latex"><span class="org-keyword">\[</span>
+endpoint_fn = create<span class="org-keyword">\_</span>end<span class="org-keyword">\_</span>point("https://....") <span class="org-keyword">\rightarrow</span> add<span class="org-keyword">\_</span>header(header) <span class="org-keyword">\rightarrow</span> add<span class="org-keyword">\_</span>tools(my<span class="org-keyword">\_</span>tools)
+<span class="org-keyword">\]</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orge3a8b21" class="outline-2">
+<h2 id="orge3a8b21"><span class="section-number-2">5.</span> Resources</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+<a href="https://github.com/ollama/ollama/blob/main/docs/api.md">Ollama API</a>
+<a href="https://openrouter.ai/docs/requests">openrouter API</a>
+</p>
+
+<p>
+<a href="https://www.perplexity.ai/search/when-communicating-with-ollama-7cGu86RKQ4a.krw6ewzosQ">Perplexity</a>
+eww
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: calle</p>
+<p class="date">Created: 2024-12-22 Sun 11:54</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
