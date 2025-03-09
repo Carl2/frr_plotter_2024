@@ -8,7 +8,13 @@ version = "0.0.1"
 description = "Parsing zwift frr values"
 authors = ["Your Name <olsen.carl@gmail.com>"]
 package-mode = false
-packages = []  # Explicitly specify no packages to include
+packages = [
+    { include = "col" },
+    { include = "frr2" },
+]
+
+[tool.poetry.scripts]
+frr_parser = "frr_parser_run:main"
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -21,7 +27,3 @@ pymonad="2.4.0"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.build]
-generate-setup-file = false
-script = "none"
