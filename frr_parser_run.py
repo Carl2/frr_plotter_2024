@@ -127,38 +127,56 @@ def fn_streamlit(fig: plt.Figure, header_text: str, tbl):
 #                                   The rest                                  #
 ###############################################################################
 
+# def form_data():
+#     if 'frr_data' not in st.session_state:
+#         st.session_state.frr_data = ''
+
+#     # Use form to group input and submission
+#     with st.form("frr_form"):
+#         text_input = st.text_area(
+#             "FRR Data",
+#             value=st.session_state.frr_data,
+#             height=300,
+#             key="frr_input"
+#         )
+#         submitted = st.form_submit_button("Process Data")
+
+#         if submitted:
+#             if not text_input.strip():
+#                 st.error("Please paste FRR data in the text box above")
+#             else:
+#                 st.session_state.frr_data = text_input  # Persist data
+#                 lines = text_input.strip().splitlines()
+#                 lst = parse_lines(lines)
+#                 df = make_performance_dataframe(lst)
+#                 ic(df)
+#                 return(df)
+#                 # Proceed with data processing
+#                 #process_data(text_input)  # Your processing function
+
 def form_data():
-    if 'frr_data' not in st.session_state:
-        st.session_state.frr_data = ''
+    if 'submitted_data' not in st.session_state:
+        st.session_state.submitted_data = False
 
     # Use form to group input and submission
     with st.form("frr_form"):
         text_input = st.text_area(
-            "FRR Data",
-            value=st.session_state.frr_data,
+            "Paste FRR data below:",
             height=300,
             key="frr_input"
         )
         submitted = st.form_submit_button("Process Data")
 
-        if submitted:
-            if not text_input.strip():
-                st.error("Please paste FRR data in the text box above")
-            else:
-                st.session_state.frr_data = text_input  # Persist data
-                lines = text_input.strip().splitlines()
-                lst = parse_lines(lines)
-                df = make_performance_dataframe(lst)
-                ic(df)
-                return(df)
-                # Proceed with data processing
-                #process_data(text_input)  # Your processing function
+        if submitted and text_input.strip():
+            st.session_state.submitted_data = True
+            return text_input.strip()
 
+    return None
 
 
 def main():
     st.title("FRR Parser")
-    st.write("Paste FRR data below (same format as tezt.txt):")
+    #st.write("Paste FRR data below (same format as tezt.txt):")
     # TODO: THis not complete.
     #df = form_data()
 
@@ -171,7 +189,7 @@ def main():
     #     return
 
     # if st.button("Generate Plots"):
-    df = parse_file("./tezt_world.txt")  # Commented out original file reading line
+    #df = parse_file("./tezt_world.txt")  # Commented out original file reading line
     #     #df = parse_file(text_stream)
 
     # Convert text input to a temporary file-like object
@@ -180,131 +198,138 @@ def main():
 
     #df = parse_file("tezt.txt")  # Commented out original file reading line
     # Configure different plot types using PlotConfig
-    egap_config = PlotConfig(
-        index_field='egap_td',
-        ylabel='Gap',
-        y_formatter=set_ytick_time_label
-    )
+    data = form_data()
+    if data and st.session_state.submitted_data:
+        # Convert input to lines
+        lines = data.splitlines()
+        df = parse_lines(lines)
+        df = make_performance_dataframe(df)
 
-    egap_config_sum = PlotConfig(
-        index_field='egap_td',
-        ylabel='Gap',
-        y_formatter=set_ytick_time_label,
-        stage_name_handler=egap_sum_handler
-    )
+        egap_config = PlotConfig(
+            index_field='egap_td',
+            ylabel='Gap',
+            y_formatter=set_ytick_time_label
+        )
 
-    times_config = PlotConfig(
-        index_field='time_delta',
-        ylabel='Time',
-        y_formatter=set_ytick_time_label
-    )
+        egap_config_sum = PlotConfig(
+            index_field='egap_td',
+            ylabel='Gap',
+            y_formatter=set_ytick_time_label,
+            stage_name_handler=egap_sum_handler
+        )
 
-    polka_config = PlotConfig(
-        index_field='polka',
-        ylabel='Polka'
-    )
+        times_config = PlotConfig(
+            index_field='time_delta',
+            ylabel='Time',
+            y_formatter=set_ytick_time_label
+        )
 
-    polka_config_sum = PlotConfig(
-        index_field='polka',
-        ylabel='Polka',
-        stage_name_handler=polka_sum_handler
-    )
+        polka_config = PlotConfig(
+            index_field='polka',
+            ylabel='Polka'
+        )
 
-    sprint_config = PlotConfig(
-        index_field='sprint',
-        ylabel='Polka'
-    )
+        polka_config_sum = PlotConfig(
+            index_field='polka',
+            ylabel='Polka',
+            stage_name_handler=polka_sum_handler
+        )
 
-    sprint_config_sum = PlotConfig(
-        index_field='sprint',
-        ylabel='Polka',
-        stage_name_handler=polka_sum_handler
-    )
+        sprint_config = PlotConfig(
+            index_field='sprint',
+            ylabel='Polka'
+        )
 
-    total_config = PlotConfig(
-        index_field='total',
-        ylabel='Total',
-    )
+        sprint_config_sum = PlotConfig(
+            index_field='sprint',
+            ylabel='Polka',
+            stage_name_handler=polka_sum_handler
+        )
 
-    total_config_sum = PlotConfig(
-        index_field='total',
-        ylabel='Total accumulated',
-        stage_name_handler=polka_sum_handler
-    )
+        total_config = PlotConfig(
+            index_field='total',
+            ylabel='Total',
+        )
+
+        total_config_sum = PlotConfig(
+            index_field='total',
+            ylabel='Total accumulated',
+            stage_name_handler=polka_sum_handler
+        )
 
 
-    ###########################################################################
-    #                              Createing data                             #
-    ###########################################################################
-    # Create plots using the generic handler
-    fig,handler = generate_matplot_handler(egap_config)
-    df_data=make_stage_plot_by_name2(
-        df, 'stage', 'name',
-        fn_streamlit(fig,"Rider E-Gap Plot", "egap"),
-        lambda x, y: handler(x, y),
-        egap_config
-    )
+        ###########################################################################
+        #                              Createing data                             #
+        ###########################################################################
+        # Create plots using the generic handler
+        fig,handler = generate_matplot_handler(egap_config)
+        df_data=make_stage_plot_by_name2(
+            df, 'stage', 'name',
+            fn_streamlit(fig,"Rider E-Gap Plot", "egap"),
+            lambda x, y: handler(x, y),
+            egap_config
+        )
 
-    fig,handler = generate_matplot_handler(egap_config_sum)
-    _ =make_stage_plot_by_name2(
-        df, 'stage', 'name',
-        fn_streamlit(fig, "Rider E-Gap accumulated ", "egap"),
-        lambda x, y: handler(x, y),
-        egap_config_sum
-    )
+        fig,handler = generate_matplot_handler(egap_config_sum)
+        _ =make_stage_plot_by_name2(
+            df, 'stage', 'name',
+            fn_streamlit(fig, "Rider E-Gap accumulated ", "egap"),
+            lambda x, y: handler(x, y),
+            egap_config_sum
+        )
 
-    fig,handler = generate_matplot_handler(times_config)
-    _ = make_stage_plot_by_name2(
-        df, 'stage', 'name',
-        fn_streamlit(fig, "Rider times ", "time_delta"),
-        lambda x, y: handler(x, y),
-        times_config
-    )
+        fig,handler = generate_matplot_handler(times_config)
+        _ = make_stage_plot_by_name2(
+            df, 'stage', 'name',
+            fn_streamlit(fig, "Rider times ", "time_delta"),
+            lambda x, y: handler(x, y),
+            times_config
+        )
 
-    fig,handler = generate_matplot_handler(polka_config)
-    _ = make_stage_plot_by_name2(
-        df, 'stage', 'name',
-        fn_streamlit(fig, "Rider polka score ", "polka"),
-        lambda x, y: handler(x, y),
-        polka_config)
+        fig,handler = generate_matplot_handler(polka_config)
+        _ = make_stage_plot_by_name2(
+            df, 'stage', 'name',
+            fn_streamlit(fig, "Rider polka score ", "polka"),
+            lambda x, y: handler(x, y),
+            polka_config)
 
-    fig,handler = generate_matplot_handler(polka_config_sum)
-    _ = make_stage_plot_by_name2(
-        df, 'stage', 'name',
-        fn_streamlit(fig, "Rider polka score accum", "polka"),
-        lambda x, y: handler(x, y),
-        polka_config_sum)
+        fig,handler = generate_matplot_handler(polka_config_sum)
+        _ = make_stage_plot_by_name2(
+            df, 'stage', 'name',
+            fn_streamlit(fig, "Rider polka score accum", "polka"),
+            lambda x, y: handler(x, y),
+            polka_config_sum)
 
-    fig,handler = generate_matplot_handler(sprint_config)
-    _ = make_stage_plot_by_name2(
-        df, 'stage', 'name',
-        fn_streamlit(fig, "Rider sprint score", "sprint"),
-        lambda x, y: handler(x, y),
-        sprint_config)
+        fig,handler = generate_matplot_handler(sprint_config)
+        _ = make_stage_plot_by_name2(
+            df, 'stage', 'name',
+            fn_streamlit(fig, "Rider sprint score", "sprint"),
+            lambda x, y: handler(x, y),
+            sprint_config)
 
-    fig,handler = generate_matplot_handler(sprint_config_sum)
-    _ = make_stage_plot_by_name2(
-        df, 'stage', 'name',
-        fn_streamlit(fig, "Rider sprint score accumulated", "sprint"),
-        lambda x, y: handler(x, y),
-        sprint_config_sum)
+        fig,handler = generate_matplot_handler(sprint_config_sum)
+        _ = make_stage_plot_by_name2(
+            df, 'stage', 'name',
+            fn_streamlit(fig, "Rider sprint score accumulated", "sprint"),
+            lambda x, y: handler(x, y),
+            sprint_config_sum)
 
-    fig,handler = generate_matplot_handler(total_config)
-    _ = make_stage_plot_by_name2(
-        df, 'stage', 'name',
-        fn_streamlit(fig, "Rider Total score/stage", "total"),
-        lambda x, y: handler(x, y),
-        total_config)
+        fig,handler = generate_matplot_handler(total_config)
+        _ = make_stage_plot_by_name2(
+            df, 'stage', 'name',
+            fn_streamlit(fig, "Rider Total score/stage", "total"),
+            lambda x, y: handler(x, y),
+            total_config)
 
-    fig,handler = generate_matplot_handler(total_config_sum)
-    _ = make_stage_plot_by_name2(
-        df, 'stage', 'name',
-        fn_streamlit(fig, "Rider Total score accumulated", "total"),
-        lambda x, y: handler(x, y),
-        total_config_sum)
+        fig,handler = generate_matplot_handler(total_config_sum)
+        _ = make_stage_plot_by_name2(
+            df, 'stage', 'name',
+            fn_streamlit(fig, "Rider Total score accumulated", "total"),
+            lambda x, y: handler(x, y),
+            total_config_sum)
 
-    st.header("Data Table")
-    st.dataframe(df_data)
+        st.header("Data Table")
+        st.dataframe(df_data)
 
 
 
