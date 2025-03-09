@@ -3,7 +3,7 @@
 from datetime import timedelta
 from functools import reduce
 from pymonad.maybe import Maybe, Just, Nothing
-from icecream import ic
+#from icecream import ic
 from pdb import set_trace
 import pandas as pd
 
@@ -82,36 +82,36 @@ if __name__ == '__main__':
 
     find_fn = safe_find_fn("m", next_pos)
     next_pos, min_str = find_fn("1 hrs, 23 m 46.896 s").value
-    ic(min_str)
+    #ic(min_str)
 
     find_fn = safe_find_fn(" s", next_pos)
     next_pos, sec_str = find_fn("1 hrs, 23 m 46.896 s").value
-    ic(sec_str)
+    #ic(sec_str)
 
 
     search_for = gen_search_for_fn("1 hrs, 46.896 s")
     next_pos, hours = search_for("hrs,").value
-    ic(next_pos, hours)
+    #ic(next_pos, hours)
     #set_trace()
     maybe_min = search_for("m", next_pos)
     if maybe_min.is_just():
         next_pos, val = maybe_min.value
 
     next_pos, seconds = search_for("s", next_pos).value
-    ic(hours, seconds)
+    #ic(hours, seconds)
     # So far so good, but lets construct this so that we get
     # a dictionary with the key of the search pattern.
     # so instead i call split_by(("hrs,","m" "s"), time_str)
-    ic(split_by("1 hrs, 23 m 46.896 s", ["hrs,", "m", ".", "s"]))
-    ic(split_by("1 hrs, 46.896 s", ["hrs,", "m", "s"]))
-    ic(split_by(" 45 m ", ["hrs,", "m", "s"]))
-    ic(split_by("+6 m 48.655 s", ["+", "m", "s"]))
-    ic(split_by("", ["+", "m", ".", "s"]))
-    ic(split_by("1 hrs, 9 m 43.929 s 268w @3.30WKG,",['hrs,', 'm', 's','w','@','WKG'] ))
+    #ic(split_by("1 hrs, 23 m 46.896 s", ["hrs,", "m", ".", "s"]))
+    #ic(split_by("1 hrs, 46.896 s", ["hrs,", "m", "s"]))
+    #ic(split_by(" 45 m ", ["hrs,", "m", "s"]))
+    #ic(split_by("+6 m 48.655 s", ["+", "m", "s"]))
+    #ic(split_by("", ["+", "m", ".", "s"]))
+    #ic(split_by("1 hrs, 9 m 43.929 s 268w @3.30WKG,",['hrs,', 'm', 's','w','@','WKG'] ))
 
 
-    ic(split_by('1 hrs, 4 m 217w @3.20WKG', ['hrs,', 'm','.', 's', 'w', '@', 'WKG']))
+    #ic(split_by('1 hrs, 4 m 217w @3.20WKG', ['hrs,', 'm','.', 's', 'w', '@', 'WKG']))
 
-    ic(split_by('1 hrs, 4 m 217w @3.20WKG', ['hrs', 'm','s','w', '@', 'WKG']))
-    ic(split_by('1 hrs, 3 m 36.222 s 205w @3.30WKG', ['hrs,', 'm','s','w', '@', 'WKG']))
+    #ic(split_by('1 hrs, 4 m 217w @3.20WKG', ['hrs', 'm','s','w', '@', 'WKG']))
+    #ic(split_by('1 hrs, 3 m 36.222 s 205w @3.30WKG', ['hrs,', 'm','s','w', '@', 'WKG']))
     print("Done")

@@ -10,7 +10,7 @@ from col.common.frr_copy_parser import parse_file,parse_lines,make_performance_d
 from col.plot.plot import make_stage_plot_by_name2, PlotConfig, handle_generic_plot
 from col.plot.plotter_fns import get_mpl_output
 from pdb import set_trace
-from icecream import ic
+#from icecream import ic
 import streamlit as st
 
 

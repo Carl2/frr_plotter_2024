@@ -2,7 +2,7 @@
 from pdb import set_trace
 from functools import reduce
 from pprint import pprint
-from icecream import ic
+#from icecream import ic
 import pandas as pd
 from datetime import timedelta
 from col.common.monadic import safer_exec,Maybe
@@ -65,7 +65,7 @@ def convert_str_array_to_int(arr: list[str]) -> Maybe[list[int]]:
 
 
 def parse_effort(effort_str):
-    ic(effort_str)
+    #ic(effort_str)
     """Parse effort
 
     The current effort loooks something like
@@ -107,7 +107,7 @@ def to_timedelta( hours: Maybe, minutes: Maybe, seconds_result: list[int]) -> ti
 
 
 def parse_egap(egap_str: str)->timedelta:
-    ic(egap_str)
+    #ic(egap_str)
     td = timedelta(seconds = 0)
     if egap_str.lower() != 'Winner':
         hours,minutes,seconds_str = split_by(egap_str, ['hrs,','m','s'])
@@ -128,7 +128,7 @@ def parse_score(score_str: str) -> int:
         score_str = score_str.replace(".", "")
     return int(score_str)
 
-def parse_psf(psf_str: str) -> list(tuple[str,str,str]):
+def parse_psf(psf_str: str) -> list[tuple[str,str,str]]:
     psf_arr = psf_str.split('-')
     polka = int(psf_arr[0].rstrip())
     sprint = int(psf_arr[1].rstrip())
@@ -175,7 +175,7 @@ def parse_file(file_name: str) -> pd.DataFrame:
         lines = list(map(str.strip, file))
 
     lst = parse_lines(lines)
-    ic(lst)
+    #ic(lst)
     df = make_performance_dataframe(lst)
     return df
 
