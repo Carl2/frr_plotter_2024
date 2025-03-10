@@ -1,17 +1,34 @@
 [tool.pytest]
 pythonpath = "."
 
+[project]
+name = "frr_plotter_2024"
+authors = [
+        {name = "Calle Olsen"},
+        {email = "olsen.carl@gmail.com"}
+        ]
+version = "0.0.1"
+license = { text = "MIT" }
+requires-python = ">=3.12"
+description = "Parsing zwift frr values"
+homepage = "https://cocode.se/"
+repository = "https://github.com/Carl2/frr_plotter_2024"
+
+
 
 [tool.poetry]
-name = "frr_plotter_2024"
-version = "0.0.1"
-description = "Parsing zwift frr values"
-authors = ["Your Name <olsen.carl@gmail.com>"]
+packages = [
+         {include = "col", from = "src"},
+         {include = "frr_parser_run.py", from = "src"}
+]
 
-[tool.poetry.scripts]
-frr_parser = "frr_parser_run:main"
 
-[tool.poetry.dependencies]
+
+[project.scripts]
+frr_parser = "streamlit.web.cli:main_run src/frr_parser_run.py"
+
+
+[dependencies]
 python = "^3.12"
 streamlit = "^1.42.0"
 matplotlib = "3.9.2"
