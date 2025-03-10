@@ -1,2 +1,2 @@
 matplotlib==3.9.2
-pymonad>2.4.0
+pymonad==2.4.0
