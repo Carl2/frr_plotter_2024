@@ -127,32 +127,7 @@ def fn_streamlit(fig: plt.Figure, header_text: str, tbl):
 #                                   The rest                                  #
 ###############################################################################
 
-# def form_data():
-#     if 'frr_data' not in st.session_state:
-#         st.session_state.frr_data = ''
-
-#     # Use form to group input and submission
-#     with st.form("frr_form"):
-#         text_input = st.text_area(
-#             "FRR Data",
-#             value=st.session_state.frr_data,
-#             height=300,
-#             key="frr_input"
-#         )
-#         submitted = st.form_submit_button("Process Data")
-
-#         if submitted:
-#             if not text_input.strip():
-#                 st.error("Please paste FRR data in the text box above")
-#             else:
-#                 st.session_state.frr_data = text_input  # Persist data
-#                 lines = text_input.strip().splitlines()
-#                 lst = parse_lines(lines)
-#                 df = make_performance_dataframe(lst)
-#                 ic(df)
-#                 return(df)
-#                 # Proceed with data processing
-#                 #process_data(text_input)  # Your processing function
+# I want to have some text field descrining how to use this app
 
 def form_data():
     if 'submitted_data' not in st.session_state:
@@ -176,6 +151,19 @@ def form_data():
 
 def main():
     st.title("FRR Parser")
+    instructions = """
+    **How to Use the FRR Parser App:**
+
+    1. Go to [Flamme Rouge Racing Tour Results Performance](https://flammerougeracing.co.uk/tour-results-performance/).
+    2. Filter out the riders you want to see (for example, by team).
+    3. Copy the filtered rider data from the website.
+    4. Paste the copied data into the text field provided below.
+    5. To add more riders, simply append their data to the text field.
+    6. Once you have entered all the necessary data, click on the "Process Data" button.
+    7. The plots for each rider and stage will appear below once the data is processed.
+    """
+
+    st.markdown(instructions)
     #st.write("Paste FRR data below (same format as tezt.txt):")
     # TODO: THis not complete.
     #df = form_data()
@@ -246,6 +234,19 @@ def main():
             stage_name_handler=polka_sum_handler
         )
 
+        finish_config = PlotConfig(
+            index_field='finish',
+            ylabel='Finish points'
+        )
+
+        finish_config_sum = PlotConfig(
+            index_field='finish',
+            ylabel='Finish accu.',
+            stage_name_handler=polka_sum_handler
+        )
+
+
+
         total_config = PlotConfig(
             index_field='total',
             ylabel='Total',
@@ -313,6 +314,21 @@ def main():
             fn_streamlit(fig, "Rider sprint score accumulated", "sprint"),
             lambda x, y: handler(x, y),
             sprint_config_sum)
+
+        fig,handler = generate_matplot_handler(finish_config)
+        _ = make_stage_plot_by_name2(
+            df, 'stage', 'name',
+            fn_streamlit(fig, "Rider finish score", "finish"),
+            lambda x, y: handler(x, y),
+            finish_config)
+
+        fig,handler = generate_matplot_handler(finish_config_sum)
+        _ = make_stage_plot_by_name2(
+            df, 'stage', 'name',
+            fn_streamlit(fig, "Rider finish score accumulated", "finish"),
+            lambda x, y: handler(x, y),
+            finish_config_sum)
+
 
         fig,handler = generate_matplot_handler(total_config)
         _ = make_stage_plot_by_name2(
